@@ -1,0 +1,595 @@
+{
+  "type" : "record",
+  "name" : "fact_job_applications",
+  "doc" : "Sqoop import of fact_job_applications",
+  "fields" : [ {
+    "name" : "fact_id",
+    "type" : [ "null", "long" ],
+    "default" : null,
+    "columnName" : "fact_id",
+    "sqlType" : "-5"
+  }, {
+    "name" : "job_number",
+    "type" : [ "null", "long" ],
+    "default" : null,
+    "columnName" : "job_number",
+    "sqlType" : "-5"
+  }, {
+    "name" : "doc_number",
+    "type" : [ "null", "int" ],
+    "default" : null,
+    "columnName" : "doc_number",
+    "sqlType" : "4"
+  }, {
+    "name" : "borough",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "borough",
+    "sqlType" : "12"
+  }, {
+    "name" : "house_number",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "house_number",
+    "sqlType" : "12"
+  }, {
+    "name" : "street_name",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "street_name",
+    "sqlType" : "12"
+  }, {
+    "name" : "block",
+    "type" : [ "null", "int" ],
+    "default" : null,
+    "columnName" : "block",
+    "sqlType" : "4"
+  }, {
+    "name" : "lot",
+    "type" : [ "null", "int" ],
+    "default" : null,
+    "columnName" : "lot",
+    "sqlType" : "4"
+  }, {
+    "name" : "bin_number",
+    "type" : [ "null", "long" ],
+    "default" : null,
+    "columnName" : "bin_number",
+    "sqlType" : "-5"
+  }, {
+    "name" : "job_type",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "job_type",
+    "sqlType" : "12"
+  }, {
+    "name" : "job_status",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "job_status",
+    "sqlType" : "12"
+  }, {
+    "name" : "job_status_descr",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "job_status_descr",
+    "sqlType" : "12"
+  }, {
+    "name" : "latest_action_date",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "latest_action_date",
+    "sqlType" : "12"
+  }, {
+    "name" : "building_type",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "building_type",
+    "sqlType" : "12"
+  }, {
+    "name" : "community_board",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "community_board",
+    "sqlType" : "12"
+  }, {
+    "name" : "cluster",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "cluster",
+    "sqlType" : "12"
+  }, {
+    "name" : "landmarked",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "landmarked",
+    "sqlType" : "12"
+  }, {
+    "name" : "adult_estab",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "adult_estab",
+    "sqlType" : "12"
+  }, {
+    "name" : "loft_board",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "loft_board",
+    "sqlType" : "12"
+  }, {
+    "name" : "city_owned",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "city_owned",
+    "sqlType" : "12"
+  }, {
+    "name" : "little_e",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "little_e",
+    "sqlType" : "12"
+  }, {
+    "name" : "pc_filed",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "pc_filed",
+    "sqlType" : "12"
+  }, {
+    "name" : "efiling_filed",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "efiling_filed",
+    "sqlType" : "12"
+  }, {
+    "name" : "plumbing",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "plumbing",
+    "sqlType" : "12"
+  }, {
+    "name" : "mechanical",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "mechanical",
+    "sqlType" : "12"
+  }, {
+    "name" : "boiler",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "boiler",
+    "sqlType" : "12"
+  }, {
+    "name" : "fuel_burning",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "fuel_burning",
+    "sqlType" : "12"
+  }, {
+    "name" : "fuel_storage",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "fuel_storage",
+    "sqlType" : "12"
+  }, {
+    "name" : "standpipe",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "standpipe",
+    "sqlType" : "12"
+  }, {
+    "name" : "sprinkler",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "sprinkler",
+    "sqlType" : "12"
+  }, {
+    "name" : "fire_alarm",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "fire_alarm",
+    "sqlType" : "12"
+  }, {
+    "name" : "equipment",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "equipment",
+    "sqlType" : "12"
+  }, {
+    "name" : "fire_suppression",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "fire_suppression",
+    "sqlType" : "12"
+  }, {
+    "name" : "curb_cut",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "curb_cut",
+    "sqlType" : "12"
+  }, {
+    "name" : "other",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "other",
+    "sqlType" : "12"
+  }, {
+    "name" : "other_description",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "other_description",
+    "sqlType" : "12"
+  }, {
+    "name" : "applicant_first_name",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "applicant_first_name",
+    "sqlType" : "12"
+  }, {
+    "name" : "applicant_last_name",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "applicant_last_name",
+    "sqlType" : "12"
+  }, {
+    "name" : "applicant_professional_title",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "applicant_professional_title",
+    "sqlType" : "12"
+  }, {
+    "name" : "applicant_license",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "applicant_license",
+    "sqlType" : "12"
+  }, {
+    "name" : "professional_cert",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "professional_cert",
+    "sqlType" : "12"
+  }, {
+    "name" : "pre_filing_date",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "pre_filing_date",
+    "sqlType" : "12"
+  }, {
+    "name" : "paid",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "paid",
+    "sqlType" : "12"
+  }, {
+    "name" : "fully_paid",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "fully_paid",
+    "sqlType" : "12"
+  }, {
+    "name" : "assigned",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "assigned",
+    "sqlType" : "12"
+  }, {
+    "name" : "approved",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "approved",
+    "sqlType" : "12"
+  }, {
+    "name" : "fully_permitted",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "fully_permitted",
+    "sqlType" : "12"
+  }, {
+    "name" : "initial_cost",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "initial_cost",
+    "sqlType" : "2"
+  }, {
+    "name" : "total_est_fee",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "total_est_fee",
+    "sqlType" : "2"
+  }, {
+    "name" : "fee_status",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "fee_status",
+    "sqlType" : "12"
+  }, {
+    "name" : "existing_zoning_sqft",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "existing_zoning_sqft",
+    "sqlType" : "2"
+  }, {
+    "name" : "proposed_zoning_sqft",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "proposed_zoning_sqft",
+    "sqlType" : "2"
+  }, {
+    "name" : "horizontal_enlrgmt",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "horizontal_enlrgmt",
+    "sqlType" : "12"
+  }, {
+    "name" : "vertical_enlrgmt",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "vertical_enlrgmt",
+    "sqlType" : "12"
+  }, {
+    "name" : "enlargement_sqft",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "enlargement_sqft",
+    "sqlType" : "2"
+  }, {
+    "name" : "street_frontage",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "street_frontage",
+    "sqlType" : "2"
+  }, {
+    "name" : "existing_no_of_stories",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "existing_no_of_stories",
+    "sqlType" : "2"
+  }, {
+    "name" : "proposed_no_of_stories",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "proposed_no_of_stories",
+    "sqlType" : "2"
+  }, {
+    "name" : "existing_height",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "existing_height",
+    "sqlType" : "2"
+  }, {
+    "name" : "proposed_height",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "proposed_height",
+    "sqlType" : "2"
+  }, {
+    "name" : "existing_dwelling_units",
+    "type" : [ "null", "int" ],
+    "default" : null,
+    "columnName" : "existing_dwelling_units",
+    "sqlType" : "4"
+  }, {
+    "name" : "proposed_dwelling_units",
+    "type" : [ "null", "int" ],
+    "default" : null,
+    "columnName" : "proposed_dwelling_units",
+    "sqlType" : "4"
+  }, {
+    "name" : "existing_occupancy",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "existing_occupancy",
+    "sqlType" : "12"
+  }, {
+    "name" : "proposed_occupancy",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "proposed_occupancy",
+    "sqlType" : "12"
+  }, {
+    "name" : "site_fill",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "site_fill",
+    "sqlType" : "12"
+  }, {
+    "name" : "zoning_dist1",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "zoning_dist1",
+    "sqlType" : "12"
+  }, {
+    "name" : "zoning_dist2",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "zoning_dist2",
+    "sqlType" : "12"
+  }, {
+    "name" : "zoning_dist3",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "zoning_dist3",
+    "sqlType" : "12"
+  }, {
+    "name" : "special_district1",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "special_district1",
+    "sqlType" : "12"
+  }, {
+    "name" : "special_district2",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "special_district2",
+    "sqlType" : "12"
+  }, {
+    "name" : "owner_type",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "owner_type",
+    "sqlType" : "12"
+  }, {
+    "name" : "non_profit",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "non_profit",
+    "sqlType" : "12"
+  }, {
+    "name" : "owner_first_name",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "owner_first_name",
+    "sqlType" : "12"
+  }, {
+    "name" : "owner_last_name",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "owner_last_name",
+    "sqlType" : "12"
+  }, {
+    "name" : "owner_business_name",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "owner_business_name",
+    "sqlType" : "12"
+  }, {
+    "name" : "owner_house_number",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "owner_house_number",
+    "sqlType" : "12"
+  }, {
+    "name" : "owner_house_street_name",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "owner_house_street_name",
+    "sqlType" : "12"
+  }, {
+    "name" : "city",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "city",
+    "sqlType" : "12"
+  }, {
+    "name" : "state",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "state",
+    "sqlType" : "12"
+  }, {
+    "name" : "zip",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "zip",
+    "sqlType" : "12"
+  }, {
+    "name" : "owner_phone",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "owner_phone",
+    "sqlType" : "12"
+  }, {
+    "name" : "job_description",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "job_description",
+    "sqlType" : "12"
+  }, {
+    "name" : "dobrundate",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "dobrundate",
+    "sqlType" : "12"
+  }, {
+    "name" : "job_s1_no",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "job_s1_no",
+    "sqlType" : "12"
+  }, {
+    "name" : "total_construction_floor_area",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "total_construction_floor_area",
+    "sqlType" : "2"
+  }, {
+    "name" : "withdrawal_flag",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "withdrawal_flag",
+    "sqlType" : "12"
+  }, {
+    "name" : "signoff_date",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "signoff_date",
+    "sqlType" : "12"
+  }, {
+    "name" : "special_action_status",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "special_action_status",
+    "sqlType" : "12"
+  }, {
+    "name" : "special_action_date",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "special_action_date",
+    "sqlType" : "12"
+  }, {
+    "name" : "building_class",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "building_class",
+    "sqlType" : "12"
+  }, {
+    "name" : "job_no_good_count",
+    "type" : [ "null", "int" ],
+    "default" : null,
+    "columnName" : "job_no_good_count",
+    "sqlType" : "4"
+  }, {
+    "name" : "gis_latitude",
+    "type" : [ "null", "double" ],
+    "default" : null,
+    "columnName" : "gis_latitude",
+    "sqlType" : "8"
+  }, {
+    "name" : "gis_longitude",
+    "type" : [ "null", "double" ],
+    "default" : null,
+    "columnName" : "gis_longitude",
+    "sqlType" : "8"
+  }, {
+    "name" : "gis_council_district",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "gis_council_district",
+    "sqlType" : "12"
+  }, {
+    "name" : "gis_census_tract",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "gis_census_tract",
+    "sqlType" : "12"
+  }, {
+    "name" : "gis_nta_name",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "gis_nta_name",
+    "sqlType" : "12"
+  }, {
+    "name" : "gis_bin",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "gis_bin",
+    "sqlType" : "12"
+  }, {
+    "name" : "created_at",
+    "type" : [ "null", "long" ],
+    "default" : null,
+    "columnName" : "created_at",
+    "sqlType" : "93"
+  } ],
+  "tableName" : "fact_job_applications"
+}

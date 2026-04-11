@@ -11,7 +11,7 @@ DB_PORT="${PGPORT:-5432}"
 DB_NAME="${PGDATABASE:-team13_projectdb}"
 DB_USER="${PGUSER:-team13}"
 
-HDFS_BASE_DIR="/user/${DB_USER}/stage1_sqoop"
+HDFS_BASE_DIR="/user/${DB_USER}/project/warehouse"
 
 DB_PASSWORD="$(cat "$SECRETS_FILE")"
 
@@ -40,6 +40,12 @@ for table in "${TABLES[@]}"; do
     --outdir "$OUTPUT_DIR" \
     --m 1
 done
+
+HDFS_WAREHOUSE_DIR="/user/team13/project/warehouse"
+echo "Creating HDFS directory for AVRO schemas..."
+hdfs dfs -mkdir -p "${HDFS_WAREHOUSE_DIR}/avsc"
+echo "Uploading .avsc files to HDFS..."
+hdfs dfs -put -f "$OUTPUT_DIR"/*.avsc "${HDFS_WAREHOUSE_DIR}/avsc"
 
 echo "Sqoop import completed."
 hdfs dfs -ls -R "$HDFS_BASE_DIR" | head -100 || true

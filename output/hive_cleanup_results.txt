@@ -1,0 +1,11 @@
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> USE team13_projectdb_hive;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP TABLE IF EXISTS fact_job_applications_ext;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SHOW TABLES;
++----------------------------+
+|          tab_name          |
++----------------------------+
+| fact_job_applications_opt  |
++----------------------------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
