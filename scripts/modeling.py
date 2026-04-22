@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 from pyspark.ml import Pipeline
-from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorAssembler, Imputer
+from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorAssembler, VectorIndexer
 from pyspark.ml.classification import LogisticRegression, RandomForestClassifier
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.ml.tuning import ParamGridBuilder, CrossValidator
@@ -94,9 +94,10 @@ numericCols = [
 
 data = data.where(F.col("job_status").isin("P", "J"))
 data = data.select(features + ["job_status"])
+data = data.na.drop()
 
 for c in categoricalCols:
-    data = data.withColumn(c, F.coalesce(F.col(c).cast("string"), F.lit("missing")))
+    data = data.withColumn(c, F.col(c).cast("string"))
 
 for c in numericCols:
     data = data.withColumn(c, F.col(c).cast("double"))
@@ -104,19 +105,20 @@ for c in numericCols:
 data = data.withColumn("label", F.when(F.col("job_status") == "P", 1.0).otherwise(0.0))
 data = data.drop("job_status")
 
-indexers = [StringIndexer(inputCol=c, outputCol="{}_indexed".format(c)).setHandleInvalid("keep") for c in categoricalCols]
+indexers = [StringIndexer(inputCol=c, outputCol="{}_indexed".format(c)).setHandleInvalid("skip") for c in categoricalCols]
 encoders = [OneHotEncoder(inputCol="{}_indexed".format(c), outputCol="{}_encoded".format(c)) for c in categoricalCols]
-imputer = Imputer(inputCols=numericCols, outputCols=numericCols)
 assembler = VectorAssembler(
     inputCols=["{}_encoded".format(c) for c in categoricalCols] + numericCols,
     outputCol="features",
 )
 
-pipeline = Pipeline(stages=indexers + encoders + [imputer, assembler])
+pipeline = Pipeline(stages=indexers + encoders + [assembler])
 pipelineModel = pipeline.fit(data)
-transformed = pipelineModel.transform(data).select("features", "label")
+data = pipelineModel.transform(data).select("features", "label")
+featureIndexer = VectorIndexer(inputCol="features", outputCol="indexedFeatures", maxCategories=4).fit(data)
+transformed = featureIndexer.transform(data)
 
-(train_data, test_data) = transformed.randomSplit([0.7, 0.3], seed=42)
+(train_data, test_data) = transformed.randomSplit([0.6, 0.4], seed=10)
 
 train_data.select("features", "label")\
     .coalesce(1)\
@@ -138,7 +140,7 @@ evaluator = BinaryClassificationEvaluator(
     metricName="areaUnderROC",
 )
 
-lr = LogisticRegression(labelCol="label", featuresCol="features")
+lr = LogisticRegression(labelCol="label", featuresCol="indexedFeatures")
 lr_grid = ParamGridBuilder()\
     .addGrid(lr.regParam, [0.01, 0.1, 0.3])\
     .addGrid(lr.elasticNetParam, [0.0, 0.5, 1.0])\
@@ -166,7 +168,7 @@ predictions1.select("label", "prediction")\
 
 auc1 = evaluator.evaluate(predictions1)
 
-rf = RandomForestClassifier(labelCol="label", featuresCol="features", seed=42)
+rf = RandomForestClassifier(labelCol="label", featuresCol="indexedFeatures", seed=42)
 rf_grid = ParamGridBuilder()\
     .addGrid(rf.numTrees, [30, 60, 90])\
     .addGrid(rf.maxDepth, [5, 10, 15])\
