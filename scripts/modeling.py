@@ -32,18 +32,6 @@ features = [
     "existing_occupancy",
     "proposed_occupancy",
     "landmarked",
-    "pc_filed",
-    "efiling_filed",
-    "plumbing",
-    "mechanical",
-    "boiler",
-    "sprinkler",
-    "fire_alarm",
-    "equipment",
-    "fire_suppression",
-    "curb_cut",
-    "initial_cost",
-    "total_est_fee",
     "existing_zoning_sqft",
     "proposed_zoning_sqft",
     "enlargement_sqft",
@@ -65,21 +53,9 @@ categoricalCols = [
     "existing_occupancy",
     "proposed_occupancy",
     "landmarked",
-    "pc_filed",
-    "efiling_filed",
-    "plumbing",
-    "mechanical",
-    "boiler",
-    "sprinkler",
-    "fire_alarm",
-    "equipment",
-    "fire_suppression",
-    "curb_cut",
 ]
 
 numericCols = [
-    "initial_cost",
-    "total_est_fee",
     "existing_zoning_sqft",
     "proposed_zoning_sqft",
     "enlargement_sqft",
@@ -94,18 +70,18 @@ numericCols = [
 
 data = data.where(F.col("job_status").isin("P", "J"))
 data = data.select(features + ["job_status"])
-data = data.na.drop()
 
 for c in categoricalCols:
-    data = data.withColumn(c, F.col(c).cast("string"))
+    data = data.withColumn(c, F.coalesce(F.col(c).cast("string"), F.lit("0")))
 
 for c in numericCols:
     data = data.withColumn(c, F.col(c).cast("double"))
 
 data = data.withColumn("label", F.when(F.col("job_status") == "P", 1.0).otherwise(0.0))
 data = data.drop("job_status")
+data = data.fillna(0, subset=numericCols)
 
-indexers = [StringIndexer(inputCol=c, outputCol="{}_indexed".format(c)).setHandleInvalid("skip") for c in categoricalCols]
+indexers = [StringIndexer(inputCol=c, outputCol="{}_indexed".format(c)).setHandleInvalid("keep") for c in categoricalCols]
 encoders = [OneHotEncoder(inputCol="{}_indexed".format(c), outputCol="{}_encoded".format(c)) for c in categoricalCols]
 assembler = VectorAssembler(
     inputCols=["{}_encoded".format(c) for c in categoricalCols] + numericCols,
