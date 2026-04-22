@@ -156,8 +156,8 @@ CREATE EXTERNAL TABLE dashboard_model1_predictions (
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
-TBLPROPERTIES ('skip.header.line.count'='1')
-LOCATION '/user/team13/project/output/model1_predictions';
+LOCATION '/user/team13/project/output/model1_predictions'
+TBLPROPERTIES ('skip.header.line.count'='1');
 
 DROP TABLE IF EXISTS dashboard_model2_predictions;
 CREATE EXTERNAL TABLE dashboard_model2_predictions (
@@ -166,8 +166,8 @@ CREATE EXTERNAL TABLE dashboard_model2_predictions (
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
-TBLPROPERTIES ('skip.header.line.count'='1')
-LOCATION '/user/team13/project/output/model2_predictions';
+LOCATION '/user/team13/project/output/model2_predictions'
+TBLPROPERTIES ('skip.header.line.count'='1');
 
 DROP TABLE IF EXISTS dashboard_evaluation;
 CREATE EXTERNAL TABLE dashboard_evaluation (
@@ -177,8 +177,8 @@ CREATE EXTERNAL TABLE dashboard_evaluation (
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
-TBLPROPERTIES ('skip.header.line.count'='1')
-LOCATION '/user/team13/project/output/evaluation';
+LOCATION '/user/team13/project/output/evaluation'
+TBLPROPERTIES ('skip.header.line.count'='1');
 
 SELECT * FROM dashboard_data_characteristics;
 SELECT * FROM dashboard_evaluation;
