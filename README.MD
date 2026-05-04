@@ -7,7 +7,7 @@ The modeling task is binary classification on applications that reached a final 
 - `P` — Plan Exam Approved
 - `J` — Plan Exam Disapproved
 
-The source dataset contains DOB job permit applications submitted through Borough Offices, eFiling, or the HUB since January 1, 2000. The project uses the prepared Hive table created in the earlier stages and trains Spark ML models on the Hadoop YARN cluster.
+The source dataset contains DOB job permit applications submitted through Borough Offices, eFiling, or the HUB since January 1, 2000. The project stores the processed data in Hive and trains Spark ML models on the Hadoop YARN cluster.
 
 ## Pipeline Stages
 
@@ -17,13 +17,13 @@ The source dataset contains DOB job permit applications submitted through Boroug
 
 `Stage 3` performs predictive modeling with Spark ML on YARN. It reads the prepared Hive table, builds the feature pipeline, trains two classification models, evaluates them, and exports model artifacts and result tables.
 
-`Stage 4` prepares Hive tables and views for the Apache Superset dashboard. It does not retrain models and does not rerun Stage 2 EDA queries; it exposes existing EDA and ML outputs in a dashboard-readable form.
+`Stage 4` prepares Hive tables and views for Apache Superset dashboard charts.
 
 ## Repository Layout
 
 - `data/` contains local data artifacts exported by the pipeline, including `train.json` and `test.json`.
 - `models/` contains local copies of the trained Spark ML models downloaded from HDFS.
-- `notebooks/` contains exploratory notebooks and the Stage 3 notebook reference. The production pipeline is implemented in scripts.
+- `notebooks/` contains notebooks used for data understanding and modeling experiments.
 - `output/` contains pipeline outputs: EDA CSV files and charts, Hive execution logs, model predictions, model evaluation, feature extraction results, and hyperparameter tuning results.
 - `scripts/` contains executable pipeline scripts.
 - `sql/` contains PostgreSQL SQL, HiveQL, EDA queries, optimization queries, and dashboard preparation queries.
@@ -36,7 +36,7 @@ The full pipeline entry point is:
 bash main.sh
 ```
 
-Individual stages can also be run directly:
+Individual stages can be run directly:
 
 ```bash
 bash scripts/stage1.sh
@@ -133,7 +133,7 @@ The same modeling outputs are also stored in HDFS under `project/data`, `project
 
 Stage 2 creates the EDA result tables and files. Queries `q1` to `q7` are data insights used in the dashboard. Query `q8` records feature coverage and supports the modeling feature-selection explanation.
 
-Stage 4 prepares the Hive layer used by Superset. It exposes the ML outputs as:
+Stage 4 prepares Hive datasets for the Superset dashboard:
 
 - `dashboard_model1_predictions`
 - `dashboard_model2_predictions`
@@ -143,10 +143,8 @@ Stage 4 prepares the Hive layer used by Superset. It exposes the ML outputs as:
 - `dashboard_hyperparameter_results`
 - `dashboard_class_balance`
 
-Superset reads these Hive tables and views through its dataset editor. The dashboard itself is saved in the Superset web interface, not in this repository.
+These Hive objects are used as Superset datasets for the dashboard charts.
 
 ## Notes
-
-`main.sh` is kept compatible with the course pipeline template.
 
 `requirements.txt` lists Python dependencies used by the scripts.
