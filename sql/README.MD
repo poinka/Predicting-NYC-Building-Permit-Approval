@@ -17,7 +17,7 @@ For Hive storage and optimization:
 
 For EDA:
 
-- `q1.hql ... q9.hql`
+- `q1.hql ... q8.hql`
 
 For dashboard preparation:
 

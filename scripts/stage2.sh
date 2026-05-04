@@ -67,7 +67,4 @@ run_query 7 "gis_nta_name,approval_rate,n"
 # Q8
 run_query 8 "feature,non_null_rows"
 
-# Q9
-run_query 9 "metric,value"
-
 echo "===== Stage 2 completed successfully ====="

@@ -54,8 +54,12 @@ warehouse = "project/hive/warehouse"
 
 spark = SparkSession.builder.appName("{} - spark ML".format(team)).master("yarn").config("hive.metastore.uris", "thrift://hadoop-02.uni.innopolis.ru:9883").config("spark.sql.warehouse.dir", warehouse).config("spark.sql.avro.compression.codec", "snappy").enableHiveSupport().getOrCreate()
 
-features = ["borough", "job_type", "professional_cert", "owner_type", "building_class", "existing_occupancy", "proposed_occupancy", "landmarked", "existing_zoning_sqft", "proposed_zoning_sqft", "enlargement_sqft", "street_frontage", "proposed_no_of_stories", "proposed_height", "proposed_dwelling_units", "total_construction_floor_area", "pre_filing_date", "gis_latitude", "gis_longitude"]
+features = ["borough", "job_type", "professional_cert", "owner_type", "building_class", "existing_occupancy", "proposed_occupancy", "landmarked", "pc_filed", "efiling_filed", "plumbing", "mechanical", "boiler", "sprinkler", "fire_alarm", "equipment", "fire_suppression", "curb_cut", "initial_cost", "total_est_fee", "existing_zoning_sqft", "proposed_zoning_sqft", "enlargement_sqft", "street_frontage", "proposed_no_of_stories", "proposed_height", "proposed_dwelling_units", "total_construction_floor_area", "pre_filing_date", "gis_latitude", "gis_longitude"]
 label = "job_status"
+categoricalCandidates = ["borough", "job_type", "professional_cert", "owner_type", "building_class", "existing_occupancy", "proposed_occupancy", "landmarked", "pc_filed", "efiling_filed", "plumbing", "mechanical", "boiler", "sprinkler", "fire_alarm", "equipment", "fire_suppression", "curb_cut"]
+numericCandidates = ["initial_cost", "total_est_fee", "existing_zoning_sqft", "proposed_zoning_sqft", "enlargement_sqft", "street_frontage", "proposed_no_of_stories", "proposed_height", "proposed_dwelling_units", "total_construction_floor_area"]
+timeCandidates = ["pre_filing_date"]
+geoCandidates = ["gis_latitude", "gis_longitude"]
 
 jobs = spark.table("team13_projectdb_hive.fact_job_applications_opt")
 jobs = jobs.filter(F.col(label).isin("P", "J"))
@@ -63,13 +67,16 @@ jobs = jobs.withColumn("pre_filing_date", F.to_timestamp("pre_filing_date"))
 min_non_null = jobs.count() * 0.5
 feature_counts = jobs.select([F.count(c).alias(c) for c in features]).collect()[0].asDict()
 features = [c for c in features if feature_counts[c] >= min_non_null]
+feature_rows = [[c, "categorical" if c in categoricalCandidates else "numeric" if c in numericCandidates else "time" if c in timeCandidates else "geospatial", int(feature_counts[c]), int(min_non_null), "yes" if c in features else "no"] for c in categoricalCandidates + numericCandidates + timeCandidates + geoCandidates]
+spark.createDataFrame(feature_rows, ["feature", "feature_group", "non_null_rows", "selection_threshold_rows", "selected"]).coalesce(1).write.mode("overwrite").format("csv").option("sep", ",").option("header", "true").save("project/output/feature_extraction")
+run("rm -f output/feature_extraction.csv && hdfs dfs -cat project/output/feature_extraction/part* > output/feature_extraction.csv")
 jobs = jobs.select(features + [label]).na.drop()
 jobs = jobs.withColumn("label", F.when(F.col("job_status") == "P", F.lit(1.0)).otherwise(F.lit(0.0)))
 
-categoricalCols = [c for c in ["borough", "job_type", "professional_cert", "owner_type", "building_class", "existing_occupancy", "proposed_occupancy", "landmarked"] if c in features]
-numericCols = [c for c in ["existing_zoning_sqft", "proposed_zoning_sqft", "enlargement_sqft", "street_frontage", "proposed_no_of_stories", "proposed_height", "proposed_dwelling_units", "total_construction_floor_area"] if c in features]
-timeCols = [c for c in ["pre_filing_date"] if c in features]
-geoCols = [c for c in ["gis_latitude", "gis_longitude"] if c in features]
+categoricalCols = [c for c in categoricalCandidates if c in features]
+numericCols = [c for c in numericCandidates if c in features]
+timeCols = [c for c in timeCandidates if c in features]
+geoCols = [c for c in geoCandidates if c in features]
 
 dateTransformer = DatePartsTransformer(timeCols[0])
 monthTransformer = SinCosTransformer("filing_month", 12, "filing_month_sin", "filing_month_cos")
@@ -95,12 +102,11 @@ test_data.select("features", "label").coalesce(1).write.mode("overwrite").format
 run("rm -f data/test.json && hdfs dfs -cat project/data/test/part* > data/test.json")
 
 lr = LogisticRegression()
-model_lr = lr.fit(train_data)
-predictions = model_lr.transform(test_data)
 evaluator1_roc = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPrediction", metricName="areaUnderROC")
-grid = ParamGridBuilder().addGrid(lr.regParam, [0.0, 0.01, 0.1]).addGrid(lr.elasticNetParam, [0.0, 0.5, 1.0]).build()
-cv = CrossValidator(estimator=lr, estimatorParamMaps=grid, evaluator=evaluator1_roc, parallelism=5, numFolds=3)
-model1 = cv.fit(train_data).bestModel
+lr_grid = ParamGridBuilder().addGrid(lr.regParam, [0.0, 0.01, 0.1]).addGrid(lr.elasticNetParam, [0.0, 0.5, 1.0]).build()
+cv = CrossValidator(estimator=lr, estimatorParamMaps=lr_grid, evaluator=evaluator1_roc, parallelism=5, numFolds=3)
+model1_cv = cv.fit(train_data)
+model1 = model1_cv.bestModel
 model1.write().overwrite().save("project/models/model1")
 run("rm -rf models/model1 && hdfs dfs -get project/models/model1 models/model1")
 predictions = model1.transform(test_data)
@@ -110,12 +116,11 @@ roc1 = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPred
 pr1 = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPrediction", metricName="areaUnderPR").evaluate(predictions)
 
 rf = RandomForestClassifier()
-model_rf = rf.fit(train_data)
-predictions = model_rf.transform(test_data)
 evaluator2_roc = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPrediction", metricName="areaUnderROC")
-grid = ParamGridBuilder().addGrid(rf.numTrees, [10, 20, 30]).addGrid(rf.maxDepth, [5, 10, 15]).build()
-cv = CrossValidator(estimator=rf, estimatorParamMaps=grid, evaluator=evaluator2_roc, parallelism=5, numFolds=3)
-model2 = cv.fit(train_data).bestModel
+rf_grid = ParamGridBuilder().addGrid(rf.numTrees, [10, 20, 30]).addGrid(rf.maxDepth, [5, 10, 15]).build()
+cv = CrossValidator(estimator=rf, estimatorParamMaps=rf_grid, evaluator=evaluator2_roc, parallelism=5, numFolds=3)
+model2_cv = cv.fit(train_data)
+model2 = model2_cv.bestModel
 model2.write().overwrite().save("project/models/model2")
 run("rm -rf models/model2 && hdfs dfs -get project/models/model2 models/model2")
 predictions = model2.transform(test_data)
@@ -128,3 +133,14 @@ models = [[str(model1), roc1, pr1], [str(model2), roc2, pr2]]
 df = spark.createDataFrame(models, ["model", "area_under_roc", "area_under_pr"])
 df.coalesce(1).write.mode("overwrite").format("csv").option("sep", ",").option("header", "true").save("project/output/evaluation")
 run("rm -f output/evaluation.csv && hdfs dfs -cat project/output/evaluation/part* > output/evaluation.csv")
+
+def get_param(param_map, name):
+    values = [str(value) for param, value in param_map.items() if param.name == name]
+    return values[0] if values else ""
+
+lr_best_metric = max(model1_cv.avgMetrics)
+rf_best_metric = max(model2_cv.avgMetrics)
+lr_rows = [["LogisticRegression", i + 1, get_param(param_map, "regParam"), get_param(param_map, "elasticNetParam"), "", "", float(model1_cv.avgMetrics[i]), "yes" if model1_cv.avgMetrics[i] == lr_best_metric else "no"] for i, param_map in enumerate(lr_grid)]
+rf_rows = [["RandomForestClassifier", i + 1, "", "", get_param(param_map, "numTrees"), get_param(param_map, "maxDepth"), float(model2_cv.avgMetrics[i]), "yes" if model2_cv.avgMetrics[i] == rf_best_metric else "no"] for i, param_map in enumerate(rf_grid)]
+spark.createDataFrame(lr_rows + rf_rows, ["model", "param_set", "reg_param", "elastic_net_param", "num_trees", "max_depth", "cv_area_under_roc", "is_best"]).coalesce(1).write.mode("overwrite").format("csv").option("sep", ",").option("header", "true").save("project/output/hyperparameter_results")
+run("rm -f output/hyperparameter_results.csv && hdfs dfs -cat project/output/hyperparameter_results/part* > output/hyperparameter_results.csv")

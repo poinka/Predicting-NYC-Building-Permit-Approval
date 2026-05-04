@@ -19,6 +19,31 @@ At a high level, the work is split into four stages.
 
 `Stage 4` prepares Hive datasets for Apache Superset. It does not build the dashboard itself in code, but it creates the tables and views that the dashboard will read.
 
+## Stage 3 Feature Selection
+
+The modeling stage does not use all columns from the original DOB table. The first reduction is manual domain-based preselection: columns are kept only if they can reasonably describe an application before the final plan examination outcome is known.
+
+The initial modeling candidate set contains application context, applicant/building attributes, work-scope flags, cost/area fields, time, and geospatial fields:
+
+`borough`, `job_type`, `professional_cert`, `owner_type`, `building_class`, `existing_occupancy`, `proposed_occupancy`, `landmarked`, `pc_filed`, `efiling_filed`, `plumbing`, `mechanical`, `boiler`, `sprinkler`, `fire_alarm`, `equipment`, `fire_suppression`, `curb_cut`, `initial_cost`, `total_est_fee`, `existing_zoning_sqft`, `proposed_zoning_sqft`, `enlargement_sqft`, `street_frontage`, `proposed_no_of_stories`, `proposed_height`, `proposed_dwelling_units`, `total_construction_floor_area`, `pre_filing_date`, `gis_latitude`, `gis_longitude`.
+
+After this preselection, `scripts/modeling.py` applies an automatic coverage rule and keeps only candidate features with at least 50% non-null values in the binary `P/J` subset. The actual selected/dropped result is written to `output/feature_extraction.csv`.
+
+The remaining source columns are not used as model inputs for these reasons:
+
+- Target and target description: `job_status` is the label, and `job_status_descr` is another representation of the outcome.
+- Row identifiers and database/import metadata: `fact_id`, `job_number`, `doc_number`, `bin_number`, `gis_bin`, `job_s1_no`, `created_at`.
+- Address and parcel identifiers: `house_number`, `street_name`, `block`, `lot`.
+- Applicant and owner identity fields: `applicant_first_name`, `applicant_last_name`, `applicant_license`, `owner_first_name`, `owner_last_name`, `owner_business_name`, `owner_house_number`, `owner_house_street_name`, `owner_phone`.
+- Free-text fields: `other_description`, `job_description`.
+- Post-filing or post-decision dates that can leak process progress or outcome information: `latest_action_date`, `paid`, `fully_paid`, `assigned`, `approved`, `fully_permitted`, `signoff_date`, `special_action_date`, `dobrundate`.
+- Administrative status fields that are not stable pre-decision predictors or duplicate process state: `fee_status`, `withdrawal_flag`, `special_action_status`, `job_no_good_count`.
+- Rare, sparse, or highly specific work-scope flags not retained in the initial candidate set: `adult_estab`, `loft_board`, `city_owned`, `little_e`, `fuel_burning`, `fuel_storage`, `standpipe`, `other`.
+- Zoning, district, and location descriptors that are either sparse, too granular, or represented by other selected fields: `building_type`, `community_board`, `cluster`, `site_fill`, `zoning_dist1`, `zoning_dist2`, `zoning_dist3`, `special_district1`, `special_district2`, `gis_council_district`, `gis_census_tract`, `gis_nta_name`.
+- Owner address fields: `city`, `state`, `zip`.
+- Applicant title and owner nonprofit flag are excluded because the current model uses `professional_cert` and `owner_type` as simpler applicant/owner signals: `applicant_professional_title`, `non_profit`.
+- Existing-size fields are excluded to avoid duplicating proposed-size and change-size fields already retained: `horizontal_enlrgmt`, `vertical_enlrgmt`, `existing_no_of_stories`, `existing_height`, `existing_dwelling_units`.
+
 ## Where Things Are
 
 - `data/` contains local dataset files and exported train/test JSON files.
@@ -53,21 +78,23 @@ This is useful when only one part of the project is being updated.
 
 The main files to inspect after a run are:
 
-- `output/q1.csv ... output/q9.csv` for EDA tables
-- `output/q1.jpg ... output/q7.jpg` for exported EDA charts
+- `output/q1.csv ... output/q8.csv` for EDA tables
+- `output/q1.jpg ... output/q8.jpg` for exported EDA charts
 - `output/model1_predictions.csv` and `output/model2_predictions.csv` for ML predictions
 - `output/evaluation.csv` for model comparison
+- `output/feature_extraction.csv` for the actual Stage 3 feature-selection result
+- `output/hyperparameter_results.csv` for cross-validation results of all tested hyperparameter configurations
 - `output/hive_results.txt`, `output/hive_optimization_results.txt`, and `output/dashboard_results.txt` for Hive execution logs
 - `data/train.json` and `data/test.json` for exported ML splits
 - `models/model1/` and `models/model2/` for trained Spark models
 
 ## How Stage 2 Feeds Stage 4
 
-The EDA queries from Stage 2 produce structured outputs such as approval-rate summaries, geographic summaries, and feature coverage tables. These are first saved as files in HDFS and then collected into local CSV files in `output/`.
+The EDA queries from Stage 2 produce structured outputs such as approval-rate summaries, geographic summaries, and feature coverage tables. These are saved in Hive/HDFS and collected into local CSV files in `output/`.
 
-Stage 4 uses those same Stage 2 outputs again. It creates Hive external tables such as `dashboard_q1`, `dashboard_q2`, ..., `dashboard_q9`, so that Superset can read them directly as datasets for charts.
+Stage 4 does not rerun the Stage 2 EDA queries. Superset can use the Hive result tables from Stage 2 directly for `q1` to `q7`. Stage 4 prepares additional dashboard datasets for feature coverage, model predictions, model evaluation, and hyperparameter tuning results.
 
-The ML results from Stage 3 are exposed to Hive as `dashboard_model1_predictions`, `dashboard_model2_predictions`, and `dashboard_evaluation`.
+The ML results from Stage 3 are exposed to Hive as `dashboard_model1_predictions`, `dashboard_model2_predictions`, `dashboard_evaluation`, `dashboard_feature_extraction`, and `dashboard_hyperparameter_results`.
 
 Stage 4 is an aggregation layer. It does not recompute analytics or retrain models. It exposes the prepared EDA and ML outputs in a form that Superset can visualize.
 

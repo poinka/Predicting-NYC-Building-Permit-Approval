@@ -13,7 +13,7 @@ The helper scripts are:
 - `build_projectdb.py` creates and fills PostgreSQL tables
 - `sqoop_to_hdfs.sh` exports the final PostgreSQL table into HDFS as Avro
 - `run_hive_db.sh`, `run_hive_optimization.sh`, `run_hive_cleanup.sh` run the main Hive steps
-- `run_q1.sh ... run_q9.sh` execute individual EDA queries
+- `run_q1.sh ... run_q8.sh` execute individual EDA queries
 - `run_hive_dashboard.sh` prepares the Hive layer that Superset will later use
 - `modeling.py` contains the actual Spark ML pipeline used in Stage 3
 
