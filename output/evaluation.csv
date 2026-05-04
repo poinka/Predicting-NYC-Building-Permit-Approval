@@ -1,3 +1,3 @@
 model,area_under_roc,area_under_pr
-"LogisticRegressionModel: uid=LogisticRegression_242fd807a1a5, numClasses=2, numFeatures=303",0.7632266024048351,0.8004956384346971
-"RandomForestClassificationModel: uid=RandomForestClassifier_2db8dc5c64ef, numTrees=30, numClasses=2, numFeatures=303",0.8091034124788143,0.8479091405700142
+LogisticRegression,0.7632266024048351,0.8004956384346971
+RandomForestClassifier,0.8091034124788143,0.8479091405700142
