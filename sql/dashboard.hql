@@ -20,6 +20,7 @@ CREATE EXTERNAL TABLE dashboard_feature_extraction (
     feature_group STRING,
     non_null_rows BIGINT,
     selection_threshold_rows BIGINT,
+    distinct_values BIGINT,
     selected STRING
 )
 ROW FORMAT DELIMITED
@@ -29,7 +30,7 @@ TBLPROPERTIES ('skip.header.line.count'='1');
 
 DROP VIEW IF EXISTS dashboard_feature_selection;
 CREATE VIEW dashboard_feature_selection AS
-SELECT feature, feature_group, non_null_rows, selection_threshold_rows, selected
+SELECT feature, feature_group, non_null_rows, selection_threshold_rows, distinct_values, selected
 FROM dashboard_feature_extraction;
 
 DROP TABLE IF EXISTS dashboard_model1_predictions;

@@ -66,9 +66,10 @@ jobs = jobs.filter(F.col(label).isin("P", "J"))
 jobs = jobs.withColumn("pre_filing_date", F.to_timestamp("pre_filing_date"))
 min_non_null = jobs.count() * 0.5
 feature_counts = jobs.select([F.count(c).alias(c) for c in features]).collect()[0].asDict()
-features = [c for c in features if feature_counts[c] >= min_non_null]
-feature_rows = [[c, "categorical" if c in categoricalCandidates else "numeric" if c in numericCandidates else "time" if c in timeCandidates else "geospatial", int(feature_counts[c]), int(min_non_null), "yes" if c in features else "no"] for c in categoricalCandidates + numericCandidates + timeCandidates + geoCandidates]
-spark.createDataFrame(feature_rows, ["feature", "feature_group", "non_null_rows", "selection_threshold_rows", "selected"]).coalesce(1).write.mode("overwrite").format("csv").option("sep", ",").option("header", "true").save("project/output/feature_extraction")
+distinct_counts = jobs.select([F.countDistinct(c).alias(c) for c in categoricalCandidates]).collect()[0].asDict()
+features = [c for c in features if feature_counts[c] >= min_non_null and (c not in categoricalCandidates or distinct_counts[c] > 1)]
+feature_rows = [[c, "categorical" if c in categoricalCandidates else "numeric" if c in numericCandidates else "time" if c in timeCandidates else "geospatial", int(feature_counts[c]), int(min_non_null), int(distinct_counts[c]) if c in categoricalCandidates else 0, "yes" if c in features else "no"] for c in categoricalCandidates + numericCandidates + timeCandidates + geoCandidates]
+spark.createDataFrame(feature_rows, ["feature", "feature_group", "non_null_rows", "selection_threshold_rows", "distinct_values", "selected"]).coalesce(1).write.mode("overwrite").format("csv").option("sep", ",").option("header", "true").save("project/output/feature_extraction")
 run("rm -f output/feature_extraction.csv && hdfs dfs -cat project/output/feature_extraction/part* > output/feature_extraction.csv")
 jobs = jobs.select(features + [label]).na.drop()
 jobs = jobs.withColumn("label", F.when(F.col("job_status") == "P", F.lit(1.0)).otherwise(F.lit(0.0)))

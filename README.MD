@@ -27,7 +27,7 @@ The initial modeling candidate set contains application context, applicant/build
 
 `borough`, `job_type`, `professional_cert`, `owner_type`, `building_class`, `existing_occupancy`, `proposed_occupancy`, `landmarked`, `pc_filed`, `efiling_filed`, `plumbing`, `mechanical`, `boiler`, `sprinkler`, `fire_alarm`, `equipment`, `fire_suppression`, `curb_cut`, `initial_cost`, `total_est_fee`, `existing_zoning_sqft`, `proposed_zoning_sqft`, `enlargement_sqft`, `street_frontage`, `proposed_no_of_stories`, `proposed_height`, `proposed_dwelling_units`, `total_construction_floor_area`, `pre_filing_date`, `gis_latitude`, `gis_longitude`.
 
-After this preselection, `scripts/modeling.py` applies an automatic coverage rule and keeps only candidate features with at least 50% non-null values in the binary `P/J` subset. The actual selected/dropped result is written to `output/feature_extraction.csv`.
+After this preselection, `scripts/modeling.py` applies automatic usability rules. It keeps candidate features with at least 50% non-null values in the binary `P/J` subset, and categorical features also need at least two distinct values so that Spark can encode them. The actual selected/dropped result is written to `output/feature_extraction.csv`.
 
 The remaining source columns are not used as model inputs for these reasons:
 
