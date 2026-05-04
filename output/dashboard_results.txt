@@ -1,0 +1,156 @@
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> USE team13_projectdb_hive;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP VIEW IF EXISTS dashboard_data_characteristics;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE VIEW dashboard_data_characteristics AS
+. . . . . . . . . . . . . . . . . . . . . . .> SELECT 'prepared_dataset_rows' AS metric, CAST(COUNT(*) AS STRING) AS value
+. . . . . . . . . . . . . . . . . . . . . . .> FROM fact_job_applications_opt;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP TABLE IF EXISTS dashboard_q8;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE dashboard_q8 (
+. . . . . . . . . . . . . . . . . . . . . . .>     feature STRING,
+. . . . . . . . . . . . . . . . . . . . . . .>     non_null_rows BIGINT
+. . . . . . . . . . . . . . . . . . . . . . .> )
+. . . . . . . . . . . . . . . . . . . . . . .> ROW FORMAT DELIMITED
+. . . . . . . . . . . . . . . . . . . . . . .> FIELDS TERMINATED BY ','
+. . . . . . . . . . . . . . . . . . . . . . .> LOCATION '/user/team13/project/output/q8';
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP TABLE IF EXISTS dashboard_feature_extraction;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE dashboard_feature_extraction (
+. . . . . . . . . . . . . . . . . . . . . . .>     feature STRING,
+. . . . . . . . . . . . . . . . . . . . . . .>     feature_group STRING,
+. . . . . . . . . . . . . . . . . . . . . . .>     non_null_rows BIGINT,
+. . . . . . . . . . . . . . . . . . . . . . .>     selection_threshold_rows BIGINT,
+. . . . . . . . . . . . . . . . . . . . . . .>     distinct_values BIGINT,
+. . . . . . . . . . . . . . . . . . . . . . .>     selected STRING
+. . . . . . . . . . . . . . . . . . . . . . .> )
+. . . . . . . . . . . . . . . . . . . . . . .> ROW FORMAT DELIMITED
+. . . . . . . . . . . . . . . . . . . . . . .> FIELDS TERMINATED BY ','
+. . . . . . . . . . . . . . . . . . . . . . .> LOCATION '/user/team13/project/output/feature_extraction'
+. . . . . . . . . . . . . . . . . . . . . . .> TBLPROPERTIES ('skip.header.line.count'='1');
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP VIEW IF EXISTS dashboard_feature_selection;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE VIEW dashboard_feature_selection AS
+. . . . . . . . . . . . . . . . . . . . . . .> SELECT feature, feature_group, non_null_rows, selection_threshold_rows, distinct_values, selected
+. . . . . . . . . . . . . . . . . . . . . . .> FROM dashboard_feature_extraction;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP TABLE IF EXISTS dashboard_model1_predictions;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE dashboard_model1_predictions (
+. . . . . . . . . . . . . . . . . . . . . . .>     label DOUBLE,
+. . . . . . . . . . . . . . . . . . . . . . .>     prediction DOUBLE
+. . . . . . . . . . . . . . . . . . . . . . .> )
+. . . . . . . . . . . . . . . . . . . . . . .> ROW FORMAT DELIMITED
+. . . . . . . . . . . . . . . . . . . . . . .> FIELDS TERMINATED BY ','
+. . . . . . . . . . . . . . . . . . . . . . .> LOCATION '/user/team13/project/output/model1_predictions'
+. . . . . . . . . . . . . . . . . . . . . . .> TBLPROPERTIES ('skip.header.line.count'='1');
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP TABLE IF EXISTS dashboard_model2_predictions;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE dashboard_model2_predictions (
+. . . . . . . . . . . . . . . . . . . . . . .>     label DOUBLE,
+. . . . . . . . . . . . . . . . . . . . . . .>     prediction DOUBLE
+. . . . . . . . . . . . . . . . . . . . . . .> )
+. . . . . . . . . . . . . . . . . . . . . . .> ROW FORMAT DELIMITED
+. . . . . . . . . . . . . . . . . . . . . . .> FIELDS TERMINATED BY ','
+. . . . . . . . . . . . . . . . . . . . . . .> LOCATION '/user/team13/project/output/model2_predictions'
+. . . . . . . . . . . . . . . . . . . . . . .> TBLPROPERTIES ('skip.header.line.count'='1');
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP TABLE IF EXISTS dashboard_evaluation;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE dashboard_evaluation (
+. . . . . . . . . . . . . . . . . . . . . . .>     model STRING,
+. . . . . . . . . . . . . . . . . . . . . . .>     area_under_roc DOUBLE,
+. . . . . . . . . . . . . . . . . . . . . . .>     area_under_pr DOUBLE
+. . . . . . . . . . . . . . . . . . . . . . .> )
+. . . . . . . . . . . . . . . . . . . . . . .> ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+. . . . . . . . . . . . . . . . . . . . . . .> LOCATION '/user/team13/project/output/evaluation'
+. . . . . . . . . . . . . . . . . . . . . . .> TBLPROPERTIES ('skip.header.line.count'='1');
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP TABLE IF EXISTS dashboard_hyperparameter_results;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE dashboard_hyperparameter_results (
+. . . . . . . . . . . . . . . . . . . . . . .>     model STRING,
+. . . . . . . . . . . . . . . . . . . . . . .>     param_set INT,
+. . . . . . . . . . . . . . . . . . . . . . .>     reg_param STRING,
+. . . . . . . . . . . . . . . . . . . . . . .>     elastic_net_param STRING,
+. . . . . . . . . . . . . . . . . . . . . . .>     num_trees STRING,
+. . . . . . . . . . . . . . . . . . . . . . .>     max_depth STRING,
+. . . . . . . . . . . . . . . . . . . . . . .>     cv_area_under_roc DOUBLE,
+. . . . . . . . . . . . . . . . . . . . . . .>     is_best STRING
+. . . . . . . . . . . . . . . . . . . . . . .> )
+. . . . . . . . . . . . . . . . . . . . . . .> ROW FORMAT DELIMITED
+. . . . . . . . . . . . . . . . . . . . . . .> FIELDS TERMINATED BY ','
+. . . . . . . . . . . . . . . . . . . . . . .> LOCATION '/user/team13/project/output/hyperparameter_results'
+. . . . . . . . . . . . . . . . . . . . . . .> TBLPROPERTIES ('skip.header.line.count'='1');
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP VIEW IF EXISTS dashboard_class_balance;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE VIEW dashboard_class_balance AS
+. . . . . . . . . . . . . . . . . . . . . . .> SELECT job_status, COUNT(*) AS cnt
+. . . . . . . . . . . . . . . . . . . . . . .> FROM fact_job_applications_opt
+. . . . . . . . . . . . . . . . . . . . . . .> WHERE job_status IN ('P','J')
+. . . . . . . . . . . . . . . . . . . . . . .> GROUP BY job_status;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SELECT * FROM dashboard_evaluation;
++----------------------------------------------------+--------------------------------------+-------------------------------------+
+|             dashboard_evaluation.model             | dashboard_evaluation.area_under_roc  | dashboard_evaluation.area_under_pr  |
++----------------------------------------------------+--------------------------------------+-------------------------------------+
+| LogisticRegressionModel: uid=LogisticRegression_242fd807a1a5, numClasses=2, numFeatures=303 | 0.7632266024048351                   | 0.8004956384346971                  |
+| RandomForestClassificationModel: uid=RandomForestClassifier_2db8dc5c64ef, numTrees=30, numClasses=2, numFeatures=303 | 0.8091034124788143                   | 0.8479091405700142                  |
++----------------------------------------------------+--------------------------------------+-------------------------------------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SELECT * FROM dashboard_feature_selection;
++--------------------------------------+--------------------------------------------+--------------------------------------------+----------------------------------------------------+----------------------------------------------+---------------------------------------+
+| dashboard_feature_selection.feature  | dashboard_feature_selection.feature_group  | dashboard_feature_selection.non_null_rows  | dashboard_feature_selection.selection_threshold_rows | dashboard_feature_selection.distinct_values  | dashboard_feature_selection.selected  |
++--------------------------------------+--------------------------------------------+--------------------------------------------+----------------------------------------------------+----------------------------------------------+---------------------------------------+
+| borough                              | categorical                                | 251999                                     | 125999                                             | 5                                            | yes                                   |
+| job_type                             | categorical                                | 251999                                     | 125999                                             | 8                                            | yes                                   |
+| professional_cert                    | categorical                                | 178382                                     | 125999                                             | 2                                            | yes                                   |
+| owner_type                           | categorical                                | 243682                                     | 125999                                             | 14                                           | yes                                   |
+| building_class                       | categorical                                | 248941                                     | 125999                                             | 197                                          | yes                                   |
+| existing_occupancy                   | categorical                                | 169093                                     | 125999                                             | 44                                           | yes                                   |
+| proposed_occupancy                   | categorical                                | 160057                                     | 125999                                             | 44                                           | yes                                   |
+| landmarked                           | categorical                                | 235478                                     | 125999                                             | 4                                            | yes                                   |
+| pc_filed                             | categorical                                | 86792                                      | 125999                                             | 2                                            | no                                    |
+| efiling_filed                        | categorical                                | 146069                                     | 125999                                             | 1                                            | no                                    |
+| plumbing                             | categorical                                | 80056                                      | 125999                                             | 1                                            | no                                    |
+| mechanical                           | categorical                                | 35363                                      | 125999                                             | 1                                            | no                                    |
+| boiler                               | categorical                                | 5430                                       | 125999                                             | 1                                            | no                                    |
+| sprinkler                            | categorical                                | 23707                                      | 125999                                             | 1                                            | no                                    |
+| fire_alarm                           | categorical                                | 11183                                      | 125999                                             | 1                                            | no                                    |
+| equipment                            | categorical                                | 26400                                      | 125999                                             | 1                                            | no                                    |
+| fire_suppression                     | categorical                                | 2985                                       | 125999                                             | 1                                            | no                                    |
+| curb_cut                             | categorical                                | 13094                                      | 125999                                             | 1                                            | no                                    |
+| initial_cost                         | numeric                                    | 0                                          | 125999                                             | 0                                            | no                                    |
+| total_est_fee                        | numeric                                    | 0                                          | 125999                                             | 0                                            | no                                    |
+| existing_zoning_sqft                 | numeric                                    | 251999                                     | 125999                                             | 0                                            | yes                                   |
+| proposed_zoning_sqft                 | numeric                                    | 251999                                     | 125999                                             | 0                                            | yes                                   |
+| enlargement_sqft                     | numeric                                    | 251999                                     | 125999                                             | 0                                            | yes                                   |
+| street_frontage                      | numeric                                    | 251999                                     | 125999                                             | 0                                            | yes                                   |
+| proposed_no_of_stories               | numeric                                    | 251999                                     | 125999                                             | 0                                            | yes                                   |
+| proposed_height                      | numeric                                    | 251999                                     | 125999                                             | 0                                            | yes                                   |
+| proposed_dwelling_units              | numeric                                    | 129629                                     | 125999                                             | 0                                            | yes                                   |
+| total_construction_floor_area        | numeric                                    | 251999                                     | 125999                                             | 0                                            | yes                                   |
+| pre_filing_date                      | time                                       | 251999                                     | 125999                                             | 0                                            | yes                                   |
+| gis_latitude                         | geospatial                                 | 250447                                     | 125999                                             | 0                                            | yes                                   |
+| gis_longitude                        | geospatial                                 | 250447                                     | 125999                                             | 0                                            | yes                                   |
++--------------------------------------+--------------------------------------------+--------------------------------------------+----------------------------------------------------+----------------------------------------------+---------------------------------------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SELECT * FROM dashboard_hyperparameter_results;
++-----------------------------------------+---------------------------------------------+---------------------------------------------+----------------------------------------------------+---------------------------------------------+---------------------------------------------+----------------------------------------------------+-------------------------------------------+
+| dashboard_hyperparameter_results.model  | dashboard_hyperparameter_results.param_set  | dashboard_hyperparameter_results.reg_param  | dashboard_hyperparameter_results.elastic_net_param | dashboard_hyperparameter_results.num_trees  | dashboard_hyperparameter_results.max_depth  | dashboard_hyperparameter_results.cv_area_under_roc | dashboard_hyperparameter_results.is_best  |
++-----------------------------------------+---------------------------------------------+---------------------------------------------+----------------------------------------------------+---------------------------------------------+---------------------------------------------+----------------------------------------------------+-------------------------------------------+
+| LogisticRegression                      | 1                                           | 0.0                                         | 0.0                                                | ""                                          | ""                                          | 0.7686107319496701                                 | no                                        |
+| LogisticRegression                      | 2                                           | 0.0                                         | 0.5                                                | ""                                          | ""                                          | 0.7686109877355569                                 | no                                        |
+| LogisticRegression                      | 3                                           | 0.0                                         | 1.0                                                | ""                                          | ""                                          | 0.7686068795389829                                 | no                                        |
+| LogisticRegression                      | 4                                           | 0.01                                        | 0.0                                                | ""                                          | ""                                          | 0.7688975531232415                                 | yes                                       |
+| LogisticRegression                      | 5                                           | 0.01                                        | 0.5                                                | ""                                          | ""                                          | 0.7685970376732534                                 | no                                        |
+| LogisticRegression                      | 6                                           | 0.01                                        | 1.0                                                | ""                                          | ""                                          | 0.7638262130326334                                 | no                                        |
+| LogisticRegression                      | 7                                           | 0.1                                         | 0.0                                                | ""                                          | ""                                          | 0.7678192151866461                                 | no                                        |
+| LogisticRegression                      | 8                                           | 0.1                                         | 0.5                                                | ""                                          | ""                                          | 0.7416723059037055                                 | no                                        |
+| LogisticRegression                      | 9                                           | 0.1                                         | 1.0                                                | ""                                          | ""                                          | 0.7080763830306576                                 | no                                        |
+| RandomForestClassifier                  | 1                                           | ""                                          | ""                                                 | 10                                          | 5                                           | 0.7534063464628644                                 | no                                        |
+| RandomForestClassifier                  | 2                                           | ""                                          | ""                                                 | 10                                          | 10                                          | 0.7794297308233329                                 | no                                        |
+| RandomForestClassifier                  | 3                                           | ""                                          | ""                                                 | 10                                          | 15                                          | 0.7970016865248827                                 | no                                        |
+| RandomForestClassifier                  | 4                                           | ""                                          | ""                                                 | 20                                          | 5                                           | 0.7512499474618383                                 | no                                        |
+| RandomForestClassifier                  | 5                                           | ""                                          | ""                                                 | 20                                          | 10                                          | 0.7813157960646939                                 | no                                        |
+| RandomForestClassifier                  | 6                                           | ""                                          | ""                                                 | 20                                          | 15                                          | 0.8000543942218723                                 | no                                        |
+| RandomForestClassifier                  | 7                                           | ""                                          | ""                                                 | 30                                          | 5                                           | 0.7643936626014238                                 | no                                        |
+| RandomForestClassifier                  | 8                                           | ""                                          | ""                                                 | 30                                          | 10                                          | 0.7830707680563467                                 | no                                        |
+| RandomForestClassifier                  | 9                                           | ""                                          | ""                                                 | 30                                          | 15                                          | 0.8037517494978694                                 | yes                                       |
++-----------------------------------------+---------------------------------------------+---------------------------------------------+----------------------------------------------------+---------------------------------------------+---------------------------------------------+----------------------------------------------------+-------------------------------------------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
