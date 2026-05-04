@@ -130,7 +130,7 @@ run("rm -f output/model2_predictions.csv && hdfs dfs -cat project/output/model2_
 roc2 = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPrediction", metricName="areaUnderROC").evaluate(predictions)
 pr2 = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPrediction", metricName="areaUnderPR").evaluate(predictions)
 
-models = [[str(model1), roc1, pr1], [str(model2), roc2, pr2]]
+models = [["LogisticRegression", float(roc1), float(pr1)], ["RandomForestClassifier", float(roc2), float(pr2)]]
 df = spark.createDataFrame(models, ["model", "area_under_roc", "area_under_pr"])
 df.coalesce(1).write.mode("overwrite").format("csv").option("sep", ",").option("header", "true").save("project/output/evaluation")
 run("rm -f output/evaluation.csv && hdfs dfs -cat project/output/evaluation/part* > output/evaluation.csv")

@@ -59,7 +59,8 @@ CREATE EXTERNAL TABLE dashboard_evaluation (
     area_under_roc DOUBLE,
     area_under_pr DOUBLE
 )
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
 LOCATION '/user/team13/project/output/evaluation'
 TBLPROPERTIES ('skip.header.line.count'='1');
 
