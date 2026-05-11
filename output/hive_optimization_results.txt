@@ -1,8 +1,8 @@
 0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> USE team13_projectdb_hive;
 0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP TABLE IF EXISTS fact_job_applications_opt;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP TABLE IF EXISTS fact_job_applications_opt ;
 0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE fact_job_applications_opt (
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE fact_job_applications_op t (
 . . . . . . . . . . . . . . . . . . . . . . .>     fact_id BIGINT,
 . . . . . . . . . . . . . . . . . . . . . . .>     job_number BIGINT,
 . . . . . . . . . . . . . . . . . . . . . . .>     doc_number INT,
@@ -86,7 +86,7 @@
 . . . . . . . . . . . . . . . . . . . . . . .>     job_description STRING,
 . . . . . . . . . . . . . . . . . . . . . . .>     dobrundate STRING,
 . . . . . . . . . . . . . . . . . . . . . . .>     job_s1_no STRING,
-. . . . . . . . . . . . . . . . . . . . . . .>     total_construction_floor_area DECIMAL(14,2),
+. . . . . . . . . . . . . . . . . . . . . . .>     total_construction_floor_area DECIMAL(14,2 ),
 . . . . . . . . . . . . . . . . . . . . . . .>     withdrawal_flag STRING,
 . . . . . . . . . . . . . . . . . . . . . . .>     signoff_date DATE,
 . . . . . . . . . . . . . . . . . . . . . . .>     special_action_status STRING,
@@ -102,16 +102,16 @@
 . . . . . . . . . . . . . . . . . . . . . . .>     created_at BIGINT
 . . . . . . . . . . . . . . . . . . . . . . .> )
 . . . . . . . . . . . . . . . . . . . . . . .> PARTITIONED BY (job_status STRING)
-. . . . . . . . . . . . . . . . . . . . . . .> CLUSTERED BY (borough, job_type) INTO 8 BUCKETS
+. . . . . . . . . . . . . . . . . . . . . . .> CLUSTERED BY (borough, job_type) INTO 8 BUCKET S
 . . . . . . . . . . . . . . . . . . . . . . .> STORED AS ORC
-. . . . . . . . . . . . . . . . . . . . . . .> LOCATION 'project/hive/warehouse/fact_job_applications_opt'
+. . . . . . . . . . . . . . . . . . . . . . .> LOCATION 'project/hive/warehouse/fact_job_appl ications_opt'
 . . . . . . . . . . . . . . . . . . . . . . .> TBLPROPERTIES ('orc.compress'='SNAPPY');
 0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
 0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SET hive.exec.dynamic.partition=true;
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SET hive.exec.dynamic.partition.mode=nonstrict;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SET hive.exec.dynamic.partition.mode=nonstrict ;
 0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SET hive.enforce.bucketing=true;
 0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> INSERT OVERWRITE TABLE fact_job_applications_opt PARTITION (job_status)
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> INSERT OVERWRITE TABLE fact_job_applications_o pt PARTITION (job_status)
 . . . . . . . . . . . . . . . . . . . . . . .> SELECT
 . . . . . . . . . . . . . . . . . . . . . . .>     fact_id,
 . . . . . . . . . . . . . . . . . . . . . . .>     job_number,
@@ -126,8 +126,8 @@
 . . . . . . . . . . . . . . . . . . . . . . .>     job_status_descr,
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .>     CASE
-. . . . . . . . . . . . . . . . . . . . . . .>         WHEN latest_action_date RLIKE '^[0-9]{2}/[0-9]{2}/[0-9]{4}$'
-. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(latest_action_date, 'MM/dd/yyyy')))
+. . . . . . . . . . . . . . . . . . . . . . .>         WHEN latest_action_date RLIKE '^[0-9]{ 2}/[0-9]{2}/[0-9]{4}$'
+. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMEST AMP(latest_action_date, 'MM/dd/yyyy')))
 . . . . . . . . . . . . . . . . . . . . . . .>         ELSE NULL
 . . . . . . . . . . . . . . . . . . . . . . .>     END AS latest_action_date,
 . . . . . . . . . . . . . . . . . . . . . . .> 
@@ -161,52 +161,52 @@
 . . . . . . . . . . . . . . . . . . . . . . .>     professional_cert,
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .>     CASE
-. . . . . . . . . . . . . . . . . . . . . . .>         WHEN pre_filing_date RLIKE '^[0-9]{2}/[0-9]{2}/[0-9]{4}$'
-. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(pre_filing_date, 'MM/dd/yyyy')))
+. . . . . . . . . . . . . . . . . . . . . . .>         WHEN pre_filing_date RLIKE '^[0-9]{2}/ [0-9]{2}/[0-9]{4}$'
+. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMEST AMP(pre_filing_date, 'MM/dd/yyyy')))
 . . . . . . . . . . . . . . . . . . . . . . .>         ELSE NULL
 . . . . . . . . . . . . . . . . . . . . . . .>     END AS pre_filing_date,
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .>     CASE
-. . . . . . . . . . . . . . . . . . . . . . .>         WHEN paid RLIKE '^[0-9]{2}/[0-9]{2}/[0-9]{4}$'
-. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(paid, 'MM/dd/yyyy')))
+. . . . . . . . . . . . . . . . . . . . . . .>         WHEN paid RLIKE '^[0-9]{2}/[0-9]{2}/[0 -9]{4}$'
+. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMEST AMP(paid, 'MM/dd/yyyy')))
 . . . . . . . . . . . . . . . . . . . . . . .>         ELSE NULL
 . . . . . . . . . . . . . . . . . . . . . . .>     END AS paid,
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .>     CASE
-. . . . . . . . . . . . . . . . . . . . . . .>         WHEN fully_paid RLIKE '^[0-9]{2}/[0-9]{2}/[0-9]{4}$'
-. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(fully_paid, 'MM/dd/yyyy')))
+. . . . . . . . . . . . . . . . . . . . . . .>         WHEN fully_paid RLIKE '^[0-9]{2}/[0-9] {2}/[0-9]{4}$'
+. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMEST AMP(fully_paid, 'MM/dd/yyyy')))
 . . . . . . . . . . . . . . . . . . . . . . .>         ELSE NULL
 . . . . . . . . . . . . . . . . . . . . . . .>     END AS fully_paid,
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .>     CASE
-. . . . . . . . . . . . . . . . . . . . . . .>         WHEN assigned RLIKE '^[0-9]{2}/[0-9]{2}/[0-9]{4}$'
-. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(assigned, 'MM/dd/yyyy')))
+. . . . . . . . . . . . . . . . . . . . . . .>         WHEN assigned RLIKE '^[0-9]{2}/[0-9]{2 }/[0-9]{4}$'
+. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMEST AMP(assigned, 'MM/dd/yyyy')))
 . . . . . . . . . . . . . . . . . . . . . . .>         ELSE NULL
 . . . . . . . . . . . . . . . . . . . . . . .>     END AS assigned,
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .>     CASE
-. . . . . . . . . . . . . . . . . . . . . . .>         WHEN approved RLIKE '^[0-9]{2}/[0-9]{2}/[0-9]{4}$'
-. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(approved, 'MM/dd/yyyy')))
+. . . . . . . . . . . . . . . . . . . . . . .>         WHEN approved RLIKE '^[0-9]{2}/[0-9]{2 }/[0-9]{4}$'
+. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMEST AMP(approved, 'MM/dd/yyyy')))
 . . . . . . . . . . . . . . . . . . . . . . .>         ELSE NULL
 . . . . . . . . . . . . . . . . . . . . . . .>     END AS approved,
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .>     CASE
-. . . . . . . . . . . . . . . . . . . . . . .>         WHEN fully_permitted RLIKE '^[0-9]{2}/[0-9]{2}/[0-9]{4}$'
-. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(fully_permitted, 'MM/dd/yyyy')))
+. . . . . . . . . . . . . . . . . . . . . . .>         WHEN fully_permitted RLIKE '^[0-9]{2}/ [0-9]{2}/[0-9]{4}$'
+. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMEST AMP(fully_permitted, 'MM/dd/yyyy')))
 . . . . . . . . . . . . . . . . . . . . . . .>         ELSE NULL
 . . . . . . . . . . . . . . . . . . . . . . .>     END AS fully_permitted,
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .>     CAST(initial_cost AS DECIMAL(14,2)),
 . . . . . . . . . . . . . . . . . . . . . . .>     CAST(total_est_fee AS DECIMAL(14,2)),
 . . . . . . . . . . . . . . . . . . . . . . .>     fee_status,
-. . . . . . . . . . . . . . . . . . . . . . .>     CAST(existing_zoning_sqft AS DECIMAL(14,2)),
-. . . . . . . . . . . . . . . . . . . . . . .>     CAST(proposed_zoning_sqft AS DECIMAL(14,2)),
+. . . . . . . . . . . . . . . . . . . . . . .>     CAST(existing_zoning_sqft AS DECIMAL(14,2) ),
+. . . . . . . . . . . . . . . . . . . . . . .>     CAST(proposed_zoning_sqft AS DECIMAL(14,2) ),
 . . . . . . . . . . . . . . . . . . . . . . .>     horizontal_enlrgmt,
 . . . . . . . . . . . . . . . . . . . . . . .>     vertical_enlrgmt,
 . . . . . . . . . . . . . . . . . . . . . . .>     CAST(enlargement_sqft AS DECIMAL(14,2)),
 . . . . . . . . . . . . . . . . . . . . . . .>     CAST(street_frontage AS DECIMAL(14,2)),
-. . . . . . . . . . . . . . . . . . . . . . .>     CAST(existing_no_of_stories AS DECIMAL(10,2)),
-. . . . . . . . . . . . . . . . . . . . . . .>     CAST(proposed_no_of_stories AS DECIMAL(10,2)),
+. . . . . . . . . . . . . . . . . . . . . . .>     CAST(existing_no_of_stories AS DECIMAL(10, 2)),
+. . . . . . . . . . . . . . . . . . . . . . .>     CAST(proposed_no_of_stories AS DECIMAL(10, 2)),
 . . . . . . . . . . . . . . . . . . . . . . .>     CAST(existing_height AS DECIMAL(10,2)),
 . . . . . . . . . . . . . . . . . . . . . . .>     CAST(proposed_height AS DECIMAL(10,2)),
 . . . . . . . . . . . . . . . . . . . . . . .>     existing_dwelling_units,
@@ -233,20 +233,20 @@
 . . . . . . . . . . . . . . . . . . . . . . .>     job_description,
 . . . . . . . . . . . . . . . . . . . . . . .>     dobrundate,
 . . . . . . . . . . . . . . . . . . . . . . .>     job_s1_no,
-. . . . . . . . . . . . . . . . . . . . . . .>     CAST(total_construction_floor_area AS DECIMAL(14,2)),
+. . . . . . . . . . . . . . . . . . . . . . .>     CAST(total_construction_floor_area AS DECI MAL(14,2)),
 . . . . . . . . . . . . . . . . . . . . . . .>     withdrawal_flag,
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .>     CASE
-. . . . . . . . . . . . . . . . . . . . . . .>         WHEN signoff_date RLIKE '^[0-9]{2}/[0-9]{2}/[0-9]{4}$'
-. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(signoff_date, 'MM/dd/yyyy')))
+. . . . . . . . . . . . . . . . . . . . . . .>         WHEN signoff_date RLIKE '^[0-9]{2}/[0- 9]{2}/[0-9]{4}$'
+. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMEST AMP(signoff_date, 'MM/dd/yyyy')))
 . . . . . . . . . . . . . . . . . . . . . . .>         ELSE NULL
 . . . . . . . . . . . . . . . . . . . . . . .>     END AS signoff_date,
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .>     special_action_status,
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .>     CASE
-. . . . . . . . . . . . . . . . . . . . . . .>         WHEN special_action_date RLIKE '^[0-9]{2}/[0-9]{2}/[0-9]{4}$'
-. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMESTAMP(special_action_date, 'MM/dd/yyyy')))
+. . . . . . . . . . . . . . . . . . . . . . .>         WHEN special_action_date RLIKE '^[0-9] {2}/[0-9]{2}/[0-9]{4}$'
+. . . . . . . . . . . . . . . . . . . . . . .>         THEN TO_DATE(FROM_UNIXTIME(UNIX_TIMEST AMP(special_action_date, 'MM/dd/yyyy')))
 . . . . . . . . . . . . . . . . . . . . . . .>         ELSE NULL
 . . . . . . . . . . . . . . . . . . . . . . .>     END AS special_action_date,
 . . . . . . . . . . . . . . . . . . . . . . .> 
@@ -263,227 +263,3 @@
 . . . . . . . . . . . . . . . . . . . . . . .>     job_status
 . . . . . . . . . . . . . . . . . . . . . . .> 
 . . . . . . . . . . . . . . . . . . . . . . .> FROM fact_job_applications_ext;
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SHOW TABLES;
-+----------------------------+
-|          tab_name          |
-+----------------------------+
-| fact_job_applications_ext  |
-| fact_job_applications_opt  |
-+----------------------------+
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DESCRIBE FORMATTED fact_job_applications_opt;
-+--------------------------------+----------------------------------------------------+-----------------------------+
-|            col_name            |                     data_type                      |           comment           |
-+--------------------------------+----------------------------------------------------+-----------------------------+
-| # col_name                     | data_type                                          | comment                     |
-| fact_id                        | bigint                                             |                             |
-| job_number                     | bigint                                             |                             |
-| doc_number                     | int                                                |                             |
-| borough                        | string                                             |                             |
-| house_number                   | string                                             |                             |
-| street_name                    | string                                             |                             |
-| block                          | int                                                |                             |
-| lot                            | int                                                |                             |
-| bin_number                     | bigint                                             |                             |
-| job_type                       | string                                             |                             |
-| job_status_descr               | string                                             |                             |
-| latest_action_date             | date                                               |                             |
-| building_type                  | string                                             |                             |
-| community_board                | string                                             |                             |
-| cluster                        | string                                             |                             |
-| landmarked                     | string                                             |                             |
-| adult_estab                    | string                                             |                             |
-| loft_board                     | string                                             |                             |
-| city_owned                     | string                                             |                             |
-| little_e                       | string                                             |                             |
-| pc_filed                       | string                                             |                             |
-| efiling_filed                  | string                                             |                             |
-| plumbing                       | string                                             |                             |
-| mechanical                     | string                                             |                             |
-| boiler                         | string                                             |                             |
-| fuel_burning                   | string                                             |                             |
-| fuel_storage                   | string                                             |                             |
-| standpipe                      | string                                             |                             |
-| sprinkler                      | string                                             |                             |
-| fire_alarm                     | string                                             |                             |
-| equipment                      | string                                             |                             |
-| fire_suppression               | string                                             |                             |
-| curb_cut                       | string                                             |                             |
-| other                          | string                                             |                             |
-| other_description              | string                                             |                             |
-| applicant_first_name           | string                                             |                             |
-| applicant_last_name            | string                                             |                             |
-| applicant_professional_title   | string                                             |                             |
-| applicant_license              | string                                             |                             |
-| professional_cert              | string                                             |                             |
-| pre_filing_date                | date                                               |                             |
-| paid                           | date                                               |                             |
-| fully_paid                     | date                                               |                             |
-| assigned                       | date                                               |                             |
-| approved                       | date                                               |                             |
-| fully_permitted                | date                                               |                             |
-| initial_cost                   | decimal(14,2)                                      |                             |
-| total_est_fee                  | decimal(14,2)                                      |                             |
-| fee_status                     | string                                             |                             |
-| existing_zoning_sqft           | decimal(14,2)                                      |                             |
-| proposed_zoning_sqft           | decimal(14,2)                                      |                             |
-| horizontal_enlrgmt             | string                                             |                             |
-| vertical_enlrgmt               | string                                             |                             |
-| enlargement_sqft               | decimal(14,2)                                      |                             |
-| street_frontage                | decimal(14,2)                                      |                             |
-| existing_no_of_stories         | decimal(10,2)                                      |                             |
-| proposed_no_of_stories         | decimal(10,2)                                      |                             |
-| existing_height                | decimal(10,2)                                      |                             |
-| proposed_height                | decimal(10,2)                                      |                             |
-| existing_dwelling_units        | int                                                |                             |
-| proposed_dwelling_units        | int                                                |                             |
-| existing_occupancy             | string                                             |                             |
-| proposed_occupancy             | string                                             |                             |
-| site_fill                      | string                                             |                             |
-| zoning_dist1                   | string                                             |                             |
-| zoning_dist2                   | string                                             |                             |
-| zoning_dist3                   | string                                             |                             |
-| special_district1              | string                                             |                             |
-| special_district2              | string                                             |                             |
-| owner_type                     | string                                             |                             |
-| non_profit                     | string                                             |                             |
-| owner_first_name               | string                                             |                             |
-| owner_last_name                | string                                             |                             |
-| owner_business_name            | string                                             |                             |
-| owner_house_number             | string                                             |                             |
-| owner_house_street_name        | string                                             |                             |
-| city                           | string                                             |                             |
-| state                          | string                                             |                             |
-| zip                            | string                                             |                             |
-| owner_phone                    | string                                             |                             |
-| job_description                | string                                             |                             |
-| dobrundate                     | string                                             |                             |
-| job_s1_no                      | string                                             |                             |
-| total_construction_floor_area  | decimal(14,2)                                      |                             |
-| withdrawal_flag                | string                                             |                             |
-| signoff_date                   | date                                               |                             |
-| special_action_status          | string                                             |                             |
-| special_action_date            | date                                               |                             |
-| building_class                 | string                                             |                             |
-| job_no_good_count              | int                                                |                             |
-| gis_latitude                   | double                                             |                             |
-| gis_longitude                  | double                                             |                             |
-| gis_council_district           | string                                             |                             |
-| gis_census_tract               | string                                             |                             |
-| gis_nta_name                   | string                                             |                             |
-| gis_bin                        | string                                             |                             |
-| created_at                     | bigint                                             |                             |
-|                                | NULL                                               | NULL                        |
-| # Partition Information        | NULL                                               | NULL                        |
-+--------------------------------+----------------------------------------------------+-----------------------------+
-|            col_name            |                     data_type                      |           comment           |
-+--------------------------------+----------------------------------------------------+-----------------------------+
-| # col_name                     | data_type                                          | comment                     |
-| job_status                     | string                                             |                             |
-|                                | NULL                                               | NULL                        |
-| # Detailed Table Information   | NULL                                               | NULL                        |
-| Database:                      | team13_projectdb_hive                              | NULL                        |
-| OwnerType:                     | USER                                               | NULL                        |
-| Owner:                         | team13                                             | NULL                        |
-| CreateTime:                    | Mon May 11 19:29:49 MSK 2026                       | NULL                        |
-| LastAccessTime:                | UNKNOWN                                            | NULL                        |
-| Retention:                     | 0                                                  | NULL                        |
-| Location:                      | hdfs://hadoop-02.uni.innopolis.ru:8020/user/team13/project/hive/warehouse/fact_job_applications_opt | NULL                        |
-| Table Type:                    | EXTERNAL_TABLE                                     | NULL                        |
-| Table Parameters:              | NULL                                               | NULL                        |
-|                                | COLUMN_STATS_ACCURATE                              | {\"BASIC_STATS\":\"true\"}  |
-|                                | EXTERNAL                                           | TRUE                        |
-|                                | bucketing_version                                  | 2                           |
-|                                | numFiles                                           | 107                         |
-|                                | numPartitions                                      | 16                          |
-|                                | numRows                                            | 2714628                     |
-|                                | orc.compress                                       | SNAPPY                      |
-|                                | rawDataSize                                        | 13687546724                 |
-|                                | totalSize                                          | 381228330                   |
-|                                | transient_lastDdlTime                              | 1778516989                  |
-|                                | NULL                                               | NULL                        |
-| # Storage Information          | NULL                                               | NULL                        |
-| SerDe Library:                 | org.apache.hadoop.hive.ql.io.orc.OrcSerde          | NULL                        |
-| InputFormat:                   | org.apache.hadoop.hive.ql.io.orc.OrcInputFormat    | NULL                        |
-| OutputFormat:                  | org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat   | NULL                        |
-| Compressed:                    | No                                                 | NULL                        |
-| Num Buckets:                   | 8                                                  | NULL                        |
-| Bucket Columns:                | [borough, job_type]                                | NULL                        |
-| Sort Columns:                  | []                                                 | NULL                        |
-| Storage Desc Params:           | NULL                                               | NULL                        |
-|                                | serialization.format                               | 1                           |
-+--------------------------------+----------------------------------------------------+-----------------------------+
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SHOW PARTITIONS fact_job_applications_opt;
-+---------------+
-|   partition   |
-+---------------+
-| job_status=3  |
-| job_status=A  |
-| job_status=B  |
-| job_status=C  |
-| job_status=D  |
-| job_status=E  |
-| job_status=F  |
-| job_status=H  |
-| job_status=J  |
-| job_status=K  |
-| job_status=L  |
-| job_status=P  |
-| job_status=Q  |
-| job_status=R  |
-| job_status=U  |
-| job_status=X  |
-+---------------+
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SELECT
-. . . . . . . . . . . . . . . . . . . . . . .>     job_status,
-. . . . . . . . . . . . . . . . . . . . . . .>     COUNT(*) AS cnt
-. . . . . . . . . . . . . . . . . . . . . . .> FROM fact_job_applications_opt
-. . . . . . . . . . . . . . . . . . . . . . .> GROUP BY job_status
-. . . . . . . . . . . . . . . . . . . . . . .> ORDER BY cnt DESC;
-+-------------+----------+
-| job_status  |   cnt    |
-+-------------+----------+
-| X           | 1678258  |
-| R           | 564835   |
-| P           | 129558   |
-| J           | 122441   |
-| Q           | 71188    |
-| U           | 49418    |
-| H           | 43504    |
-| D           | 35325    |
-| A           | 8937     |
-| E           | 7010     |
-| B           | 2253     |
-| F           | 1202     |
-| K           | 481      |
-| 3           | 159      |
-| C           | 58       |
-| L           | 1        |
-+-------------+----------+
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SELECT
-. . . . . . . . . . . . . . . . . . . . . . .>     job_status,
-. . . . . . . . . . . . . . . . . . . . . . .>     borough,
-. . . . . . . . . . . . . . . . . . . . . . .>     COUNT(*) AS cnt
-. . . . . . . . . . . . . . . . . . . . . . .> FROM fact_job_applications_opt
-. . . . . . . . . . . . . . . . . . . . . . .> WHERE job_status IN ('P','J')
-. . . . . . . . . . . . . . . . . . . . . . .> GROUP BY job_status, borough
-. . . . . . . . . . . . . . . . . . . . . . .> ORDER BY job_status, cnt DESC;
-+-------------+----------------+--------+
-| job_status  |    borough     |  cnt   |
-+-------------+----------------+--------+
-| J           | BROOKLYN       | 36589  |
-| J           | MANHATTAN      | 35378  |
-| J           | QUEENS         | 31844  |
-| J           | BRONX          | 12056  |
-| J           | STATEN ISLAND  | 6574   |
-| P           | MANHATTAN      | 48617  |
-| P           | BROOKLYN       | 32186  |
-| P           | QUEENS         | 28958  |
-| P           | BRONX          | 12620  |
-| P           | STATEN ISLAND  | 7177   |
-+-------------+----------------+--------+
-0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
