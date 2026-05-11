@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS raw_dob_job_applications;

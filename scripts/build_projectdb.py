@@ -126,7 +126,10 @@ def main() -> None:
                     rows = cur.fetchall()
                     print(f"\nQuery #{i}: {description}")
                     pprint(rows)
-
+        with conn:
+            with conn.cursor() as cur:
+                print("Dropping staging tables ...")
+                run_sql_file(cur, SQL_DIR / "drop_staging_tables.sql")
         print("\nDatabase build completed successfully.")
 
     finally:
