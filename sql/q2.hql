@@ -25,8 +25,8 @@ SELECT
     ) AS approval_rate,
     COUNT(*) AS n
 FROM fact_job_applications_opt
-WHERE job_status IN ('P','J')
-  AND borough IN ('BROOKLYN', 'MANHATTAN')  -- partition usage
+WHERE job_status IN ('P','J') -- partition pruning by job_status
+  AND borough IN ('BROOKLYN', 'MANHATTAN')  -- analytical borough filter
 GROUP BY borough, job_type;
 
 SELECT * FROM q2_results;

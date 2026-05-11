@@ -20,6 +20,9 @@ mkdir -p "$ROOT_DIR/output"
 
 password=$(head -n 1 "$SECRETS_FILE")
 
+echo "Cleaning optimized Hive table HDFS location..."
+hdfs dfs -rm -r -f /user/team13/project/hive/warehouse/fact_job_applications_opt || true
+
 beeline \
   -u jdbc:hive2://hadoop-03.uni.innopolis.ru:10001 \
   -n team13 \

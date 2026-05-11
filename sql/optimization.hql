@@ -2,17 +2,17 @@ USE team13_projectdb_hive;
 
 DROP TABLE IF EXISTS fact_job_applications_opt;
 
-CREATE TABLE fact_job_applications_opt (
+CREATE EXTERNAL TABLE fact_job_applications_opt (
     fact_id BIGINT,
     job_number BIGINT,
     doc_number INT,
+    borough STRING,
     house_number STRING,
     street_name STRING,
     block INT,
     lot INT,
     bin_number BIGINT,
     job_type STRING,
-    job_status STRING,
     job_status_descr STRING,
     latest_action_date DATE,
     building_type STRING,
@@ -101,26 +101,28 @@ CREATE TABLE fact_job_applications_opt (
     gis_bin STRING,
     created_at BIGINT
 )
-PARTITIONED BY (borough STRING)
-CLUSTERED BY (job_status) INTO 8 BUCKETS
-STORED AS ORC;
+PARTITIONED BY (job_status STRING)
+CLUSTERED BY (borough, job_type) INTO 8 BUCKETS
+STORED AS ORC
+LOCATION 'project/hive/warehouse/fact_job_applications_opt'
+TBLPROPERTIES ('orc.compress'='SNAPPY');
 
 SET hive.exec.dynamic.partition=true;
 SET hive.exec.dynamic.partition.mode=nonstrict;
 SET hive.enforce.bucketing=true;
 
-INSERT OVERWRITE TABLE fact_job_applications_opt PARTITION (borough)
+INSERT OVERWRITE TABLE fact_job_applications_opt PARTITION (job_status)
 SELECT
     fact_id,
     job_number,
     doc_number,
+    borough,
     house_number,
     street_name,
     block,
     lot,
     bin_number,
     job_type,
-    job_status,
     job_status_descr,
 
     CASE
@@ -257,13 +259,29 @@ SELECT
     gis_nta_name,
     gis_bin,
     created_at,
-    borough
+
+    job_status
+
 FROM fact_job_applications_ext;
 
 SHOW TABLES;
+
 DESCRIBE FORMATTED fact_job_applications_opt;
 
-SELECT borough, COUNT(*) AS cnt
+SHOW PARTITIONS fact_job_applications_opt;
+
+SELECT
+    job_status,
+    COUNT(*) AS cnt
 FROM fact_job_applications_opt
-GROUP BY borough
+GROUP BY job_status
 ORDER BY cnt DESC;
+
+SELECT
+    job_status,
+    borough,
+    COUNT(*) AS cnt
+FROM fact_job_applications_opt
+WHERE job_status IN ('P','J')
+GROUP BY job_status, borough
+ORDER BY job_status, cnt DESC;
