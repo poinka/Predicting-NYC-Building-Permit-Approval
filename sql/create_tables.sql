@@ -9,7 +9,7 @@ ALTER DATABASE team13_projectdb SET datestyle TO iso, ymd;
 
 -- RAW TABLE
 -- Keep raw columns as TEXT to make ingestion robust
-CREATE TABLE IF NOT EXISTS raw_dob_job_applications (
+CREATE UNLOGGED TABLE raw_dob_job_applications (
     raw_id BIGSERIAL PRIMARY KEY,
     job_number TEXT,
     doc_number TEXT,

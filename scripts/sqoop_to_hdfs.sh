@@ -38,7 +38,8 @@ for table in "${TABLES[@]}"; do
     --compress \
     --delete-target-dir \
     --outdir "$OUTPUT_DIR" \
-    --m 1
+    --num-mappers 4 \
+    --split-by fact_id 
 done
 
 HDFS_WAREHOUSE_DIR="/user/team13/project/warehouse"

@@ -1,3 +1,11 @@
+"""Build and validate the PostgreSQL database for Stage 1.
+
+This script creates the project database tables, loads the raw NYC DOB job
+application filings CSV into PostgreSQL, transforms the raw staging table into
+a typed fact table, and runs validation queries.
+"""
+
+
 import os
 from pathlib import Path
 from pprint import pprint
@@ -18,6 +26,15 @@ DB_USER = os.getenv("PGUSER", "team13")
 CSV_FILE = DATA_DIR / "dob_job_application_filings.csv"
 PASSWORD_FILE = SECRETS_DIR / ".psql.pass"
 
+test_query_descriptions = [
+    "Raw table row count",
+    "Fact table row count",
+    "Distinct job_number count",
+    "Sample rows from fact_job_applications",
+    "Number of applications by borough",
+    "Top job statuses by number of applications",
+    "Data quality check for missing or invalid coordinates",
+]
 
 def read_password() -> str:
     """Read the PostgreSQL password from the secrets file.
@@ -25,8 +42,8 @@ def read_password() -> str:
     Returns:
         str: Database password stored in secrets/.psql.pass.
     """
-    with open(PASSWORD_FILE, "r", encoding="utf-8") as f:
-        return f.read().strip()
+    with open(PASSWORD_FILE, "r", encoding="utf-8") as password_file:
+        return password_file.read().strip()
 
 
 def run_sql_file(cur, path: Path) -> None:
@@ -36,8 +53,8 @@ def run_sql_file(cur, path: Path) -> None:
         cur: Active psycopg2 cursor used to execute SQL statements.
         path (Path): Path to the SQL file that should be executed.
     """
-    with open(path, "r", encoding="utf-8") as f:
-        cur.execute(f.read())
+    with open(path, "r", encoding="utf-8") as sql_file:
+        cur.execute(sql_file.read())
 
 
 def main() -> None:
@@ -93,17 +110,21 @@ def main() -> None:
         with conn:
             with conn.cursor() as cur:
                 print("Running test_database.sql ...")
-                with open(SQL_DIR / "test_database.sql", "r", encoding="utf-8") as f:
+                with open(SQL_DIR / "test_database.sql", "r", encoding="utf-8") as sql_file:
                     commands = [
                         cmd.strip()
-                        for cmd in f.read().split(";")
+                        for cmd in sql_file.read().split(";")
                         if cmd.strip()
                     ]
-
                 for i, command in enumerate(commands, start=1):
+                    description = (
+                        test_query_descriptions[i - 1]
+                        if i <= len(test_query_descriptions)
+                        else "Additional validation query"
+                    )
                     cur.execute(command)
                     rows = cur.fetchall()
-                    print(f"\nQuery #{i}:")
+                    print(f"\nQuery #{i}: {description}")
                     pprint(rows)
 
         print("\nDatabase build completed successfully.")

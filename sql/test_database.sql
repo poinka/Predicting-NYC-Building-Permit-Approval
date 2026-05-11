@@ -7,7 +7,7 @@ FROM fact_job_applications;
 
 SELECT *
 FROM fact_job_applications
-LIMIT 10;
+LIMIT 5;
 
 SELECT borough, COUNT(*) AS cnt
 FROM fact_job_applications
@@ -18,7 +18,7 @@ SELECT job_status, COUNT(*) AS cnt
 FROM fact_job_applications
 GROUP BY job_status
 ORDER BY cnt DESC
-LIMIT 20;
+LIMIT 10;
 
 SELECT
     COUNT(*) FILTER (WHERE latest_action_date IS NULL) AS latest_action_date_nulls,
