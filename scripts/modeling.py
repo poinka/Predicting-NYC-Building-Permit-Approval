@@ -1,3 +1,5 @@
+"""Spark ML modeling pipeline for NYC DOB plan examination outcomes."""
+
 import math
 import os
 
@@ -5,143 +7,832 @@ import pyspark.sql.functions as F
 from pyspark.ml import Pipeline, Transformer
 from pyspark.ml.classification import LogisticRegression, RandomForestClassifier
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
-from pyspark.ml.feature import OneHotEncoder, StringIndexer, VectorAssembler, VectorIndexer
+from pyspark.ml.feature import (
+    ChiSqSelector,
+    OneHotEncoder,
+    StringIndexer,
+    VarianceThresholdSelector,
+    VectorAssembler,
+    VectorIndexer,
+)
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 from pyspark.sql import SparkSession
+from pyspark.sql.types import DateType, NumericType, StringType, TimestampType
+
+
+TEAM = "team13"
+WAREHOUSE = "project/hive/warehouse"
+LABEL = "job_status"
+HIVE_TABLE = "team13_projectdb_hive.fact_job_applications_opt"
+COVERAGE_THRESHOLD = 0.5
+MIN_BINARY_VARIANCE = 0.05
+HIGH_CARDINALITY_RATIO = 0.8
+HIGH_CARDINALITY_LIMIT = 500
+CHISQ_TOP_FEATURES = 50
+FINAL_FEATURE_SET = "coverage_variance_chisq"
+
+TARGET_COLUMNS = {LABEL, "job_status_descr"}
+LEAKAGE_COLUMNS = {
+    "latest_action_date",
+    "paid",
+    "fully_paid",
+    "assigned",
+    "approved",
+    "fully_permitted",
+    "signoff_date",
+    "special_action_status",
+    "special_action_date",
+    "withdrawal_flag",
+    "fee_status",
+    "job_no_good_count",
+    "dobrundate",
+}
+GEO_COLUMNS = ["gis_latitude", "gis_longitude"]
+TIME_COLUMNS = ["pre_filing_date"]
+FEATURE_SET_CONFIGS = [
+    {"name": "full", "coverage": False, "variance": False, "chisq": False},
+    {"name": "variance", "coverage": False, "variance": True, "chisq": False},
+    {"name": "coverage_variance", "coverage": True, "variance": True, "chisq": False},
+    {"name": FINAL_FEATURE_SET, "coverage": True, "variance": True, "chisq": True},
+]
 
 
 class DatePartsTransformer(Transformer):
-    def __init__(self, inputCol):
-        super().__init__()
-        self.inputCol = inputCol
+    """Split a timestamp column into year, month, and day columns."""
 
-    def _transform(self, df):
-        return df.withColumn("filing_year", F.year(F.col(self.inputCol))).withColumn("filing_month", F.month(F.col(self.inputCol))).withColumn("filing_day", F.dayofmonth(F.col(self.inputCol)))
+    def __init__(self, input_col):
+        super().__init__()
+        self.input_col = input_col
+
+    def _transform(self, dataset):
+        return (
+            dataset.withColumn("filing_year", F.coalesce(F.year(F.col(self.input_col)), F.lit(0)))
+            .withColumn("filing_month", F.coalesce(F.month(F.col(self.input_col)), F.lit(1)))
+            .withColumn("filing_day", F.coalesce(F.dayofmonth(F.col(self.input_col)), F.lit(1)))
+        )
 
 
 class SinCosTransformer(Transformer):
-    def __init__(self, inputCol, period, sinCol, cosCol):
-        super().__init__()
-        self.inputCol = inputCol
-        self.period = period
-        self.sinCol = sinCol
-        self.cosCol = cosCol
+    """Encode a cyclical numeric column with sine and cosine components."""
 
-    def _transform(self, df):
-        angle = 2 * math.pi * F.col(self.inputCol) / F.lit(self.period)
-        return df.withColumn(self.sinCol, F.sin(angle)).withColumn(self.cosCol, F.cos(angle))
+    def __init__(self, input_col, period, sin_col, cos_col):
+        super().__init__()
+        self.input_col = input_col
+        self.period = period
+        self.sin_col = sin_col
+        self.cos_col = cos_col
+
+    def _transform(self, dataset):
+        angle = 2 * math.pi * F.col(self.input_col) / F.lit(self.period)
+        return dataset.withColumn(self.sin_col, F.sin(angle)).withColumn(
+            self.cos_col,
+            F.cos(angle),
+        )
 
 
 class GeoToECEFTransformer(Transformer):
-    def __init__(self, latCol, lonCol):
-        super().__init__()
-        self.latCol = latCol
-        self.lonCol = lonCol
+    """Convert latitude and longitude into Earth-centered coordinates."""
 
-    def _transform(self, df):
+    def __init__(self, lat_col, lon_col):
+        super().__init__()
+        self.lat_col = lat_col
+        self.lon_col = lon_col
+
+    def _transform(self, dataset):
         radius = F.lit(6378137.0)
-        lat = F.radians(F.col(self.latCol))
-        lon = F.radians(F.col(self.lonCol))
-        return df.withColumn("gis_x", radius * F.cos(lat) * F.cos(lon)).withColumn("gis_y", radius * F.cos(lat) * F.sin(lon)).withColumn("gis_z", radius * F.sin(lat))
+        lat = F.radians(F.col(self.lat_col))
+        lon = F.radians(F.col(self.lon_col))
+        return (
+            dataset.withColumn("gis_x", radius * F.cos(lat) * F.cos(lon))
+            .withColumn("gis_y", radius * F.cos(lat) * F.sin(lon))
+            .withColumn("gis_z", radius * F.sin(lat))
+        )
 
 
 def run(command):
+    """Run a shell command and return its output."""
     return os.popen(command).read()
 
 
-team = "team13"
-warehouse = "project/hive/warehouse"
+def build_spark_session():
+    """Create Spark session connected to Hive metastore."""
+    return (
+        SparkSession.builder.appName(f"{TEAM} - spark ML")
+        .master("yarn")
+        .config("hive.metastore.uris", "thrift://hadoop-02.uni.innopolis.ru:9883")
+        .config("spark.sql.warehouse.dir", WAREHOUSE)
+        .config("spark.sql.avro.compression.codec", "snappy")
+        .enableHiveSupport()
+        .getOrCreate()
+    )
 
-spark = SparkSession.builder.appName("{} - spark ML".format(team)).master("yarn").config("hive.metastore.uris", "thrift://hadoop-02.uni.innopolis.ru:9883").config("spark.sql.warehouse.dir", warehouse).config("spark.sql.avro.compression.codec", "snappy").enableHiveSupport().getOrCreate()
 
-features = ["borough", "job_type", "professional_cert", "owner_type", "building_class", "existing_occupancy", "proposed_occupancy", "landmarked", "pc_filed", "efiling_filed", "plumbing", "mechanical", "boiler", "sprinkler", "fire_alarm", "equipment", "fire_suppression", "curb_cut", "initial_cost", "total_est_fee", "existing_zoning_sqft", "proposed_zoning_sqft", "enlargement_sqft", "street_frontage", "proposed_no_of_stories", "proposed_height", "proposed_dwelling_units", "total_construction_floor_area", "pre_filing_date", "gis_latitude", "gis_longitude"]
-label = "job_status"
-categoricalCandidates = ["borough", "job_type", "professional_cert", "owner_type", "building_class", "existing_occupancy", "proposed_occupancy", "landmarked", "pc_filed", "efiling_filed", "plumbing", "mechanical", "boiler", "sprinkler", "fire_alarm", "equipment", "fire_suppression", "curb_cut"]
-numericCandidates = ["initial_cost", "total_est_fee", "existing_zoning_sqft", "proposed_zoning_sqft", "enlargement_sqft", "street_frontage", "proposed_no_of_stories", "proposed_height", "proposed_dwelling_units", "total_construction_floor_area"]
-timeCandidates = ["pre_filing_date"]
-geoCandidates = ["gis_latitude", "gis_longitude"]
+def is_geospatial(feature):
+    """Return whether a column is part of the geospatial coordinate pair."""
+    return feature in GEO_COLUMNS
 
-jobs = spark.table("team13_projectdb_hive.fact_job_applications_opt")
-jobs = jobs.filter(F.col(label).isin("P", "J"))
-jobs = jobs.withColumn("pre_filing_date", F.to_timestamp("pre_filing_date"))
-min_non_null = jobs.count() * 0.5
-feature_counts = jobs.select([F.count(c).alias(c) for c in features]).collect()[0].asDict()
-distinct_counts = jobs.select([F.countDistinct(c).alias(c) for c in categoricalCandidates]).collect()[0].asDict()
-features = [c for c in features if feature_counts[c] >= min_non_null and (c not in categoricalCandidates or distinct_counts[c] > 1)]
-feature_rows = [[c, "categorical" if c in categoricalCandidates else "numeric" if c in numericCandidates else "time" if c in timeCandidates else "geospatial", int(feature_counts[c]), int(min_non_null), int(distinct_counts[c]) if c in categoricalCandidates else 0, "yes" if c in features else "no"] for c in categoricalCandidates + numericCandidates + timeCandidates + geoCandidates]
-spark.createDataFrame(feature_rows, ["feature", "feature_group", "non_null_rows", "selection_threshold_rows", "distinct_values", "selected"]).coalesce(1).write.mode("overwrite").format("csv").option("sep", ",").option("header", "true").save("project/output/feature_extraction")
-run("rm -f output/feature_extraction.csv && hdfs dfs -cat project/output/feature_extraction/part* > output/feature_extraction.csv")
-jobs = jobs.select(features + [label]).na.drop()
-jobs = jobs.withColumn("label", F.when(F.col("job_status") == "P", F.lit(1.0)).otherwise(F.lit(0.0)))
 
-categoricalCols = [c for c in categoricalCandidates if c in features]
-numericCols = [c for c in numericCandidates if c in features]
-timeCols = [c for c in timeCandidates if c in features]
-geoCols = [c for c in geoCandidates if c in features]
+def is_time(feature):
+    """Return whether a column is used as a pre-decision time feature."""
+    return feature in TIME_COLUMNS
 
-dateTransformer = DatePartsTransformer(timeCols[0])
-monthTransformer = SinCosTransformer("filing_month", 12, "filing_month_sin", "filing_month_cos")
-dayTransformer = SinCosTransformer("filing_day", 31, "filing_day_sin", "filing_day_cos")
-geoTransformer = GeoToECEFTransformer(geoCols[0], geoCols[1])
 
-indexers = [StringIndexer(inputCol=c, outputCol="{}_indexed".format(c)).setHandleInvalid("skip") for c in categoricalCols]
-encoders = [OneHotEncoder(inputCol=indexer.getOutputCol(), outputCol="{}_encoded".format(indexer.getOutputCol())) for indexer in indexers]
-assembler = VectorAssembler(inputCols=[encoder.getOutputCol() for encoder in encoders] + numericCols + ["filing_year", "filing_month_sin", "filing_month_cos", "filing_day_sin", "filing_day_cos", "gis_x", "gis_y", "gis_z"], outputCol="features")
-pipeline = Pipeline(stages=[dateTransformer, monthTransformer, dayTransformer, geoTransformer] + indexers + encoders + [assembler])
+def is_excluded_before_selection(feature):
+    """Return static exclusion reason for fields that are not valid predictors."""
+    if feature in TARGET_COLUMNS:
+        return "target"
+    if feature in LEAKAGE_COLUMNS:
+        return "leakage"
+    return ""
 
-model = pipeline.fit(jobs)
-data = model.transform(jobs).select(["features", "label"])
-featureIndexer = VectorIndexer(inputCol="features", outputCol="indexedFeatures", maxCategories=4).fit(data)
-transformed = featureIndexer.transform(data).withColumn("row_id", F.monotonically_increasing_id())
-train_data = transformed.sampleBy("label", fractions={0.0: 0.7, 1.0: 0.7}, seed=10)
-test_data = transformed.join(train_data.select("row_id"), on="row_id", how="left_anti").drop("row_id")
-train_data = train_data.drop("row_id")
 
-train_data.select("features", "label").coalesce(1).write.mode("overwrite").format("json").save("project/data/train")
-run("rm -f data/train.json && hdfs dfs -cat project/data/train/part* > data/train.json")
-test_data.select("features", "label").coalesce(1).write.mode("overwrite").format("json").save("project/data/test")
-run("rm -f data/test.json && hdfs dfs -cat project/data/test/part* > data/test.json")
+def feature_group(feature, data_type):
+    """Return dashboard-friendly feature group name."""
+    if is_geospatial(feature):
+        return "geospatial"
+    if is_time(feature):
+        return "time"
+    if isinstance(data_type, NumericType):
+        return "numeric"
+    if isinstance(data_type, (DateType, TimestampType)):
+        return "time"
+    return "categorical"
 
-lr = LogisticRegression()
-evaluator1_roc = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPrediction", metricName="areaUnderROC")
-lr_grid = ParamGridBuilder().addGrid(lr.regParam, [0.0, 0.01, 0.1]).addGrid(lr.elasticNetParam, [0.0, 0.5, 1.0]).build()
-cv = CrossValidator(estimator=lr, estimatorParamMaps=lr_grid, evaluator=evaluator1_roc, parallelism=5, numFolds=3)
-model1_cv = cv.fit(train_data)
-model1 = model1_cv.bestModel
-model1.write().overwrite().save("project/models/model1")
-run("rm -rf models/model1 && hdfs dfs -get project/models/model1 models/model1")
-predictions = model1.transform(test_data)
-predictions.select("label", "prediction").coalesce(1).write.mode("overwrite").format("csv").option("sep", ",").option("header", "true").save("project/output/model1_predictions")
-run("rm -f output/model1_predictions.csv && hdfs dfs -cat project/output/model1_predictions/part* > output/model1_predictions.csv")
-roc1 = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPrediction", metricName="areaUnderROC").evaluate(predictions)
-pr1 = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPrediction", metricName="areaUnderPR").evaluate(predictions)
 
-rf = RandomForestClassifier()
-evaluator2_roc = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPrediction", metricName="areaUnderROC")
-rf_grid = ParamGridBuilder().addGrid(rf.numTrees, [10, 20, 30]).addGrid(rf.maxDepth, [5, 10, 15]).build()
-cv = CrossValidator(estimator=rf, estimatorParamMaps=rf_grid, evaluator=evaluator2_roc, parallelism=5, numFolds=3)
-model2_cv = cv.fit(train_data)
-model2 = model2_cv.bestModel
-model2.write().overwrite().save("project/models/model2")
-run("rm -rf models/model2 && hdfs dfs -get project/models/model2 models/model2")
-predictions = model2.transform(test_data)
-predictions.select("label", "prediction").coalesce(1).write.mode("overwrite").format("csv").option("sep", ",").option("header", "true").save("project/output/model2_predictions")
-run("rm -f output/model2_predictions.csv && hdfs dfs -cat project/output/model2_predictions/part* > output/model2_predictions.csv")
-roc2 = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPrediction", metricName="areaUnderROC").evaluate(predictions)
-pr2 = BinaryClassificationEvaluator(labelCol="label", rawPredictionCol="rawPrediction", metricName="areaUnderPR").evaluate(predictions)
+def profile_features(jobs):
+    """Profile all Hive columns before automatic feature selection."""
+    features = [field.name for field in jobs.schema.fields]
+    expressions = []
+    for feature in features:
+        expressions.append(F.count(feature).alias(f"{feature}__non_null"))
+        expressions.append(F.approx_count_distinct(feature).alias(f"{feature}__distinct"))
+    row = jobs.select(expressions).collect()[0].asDict()
+    return {
+        feature: {
+            "non_null": row[f"{feature}__non_null"],
+            "distinct": row[f"{feature}__distinct"],
+        }
+        for feature in features
+    }
 
-models = [["LogisticRegression", float(roc1), float(pr1)], ["RandomForestClassifier", float(roc2), float(pr2)]]
-df = spark.createDataFrame(models, ["model", "area_under_roc", "area_under_pr"])
-df.coalesce(1).write.mode("overwrite").format("csv").option("sep", ",").option("header", "true").save("project/output/evaluation")
-run("rm -f output/evaluation.csv && hdfs dfs -cat project/output/evaluation/part* > output/evaluation.csv")
+
+def high_cardinality_reason(feature, profile):
+    """Return exclusion reason for ID-like categorical columns."""
+    non_null = profile[feature]["non_null"]
+    distinct = profile[feature]["distinct"]
+    if not non_null:
+        return "empty"
+    if distinct > HIGH_CARDINALITY_LIMIT:
+        return "high_cardinality"
+    if distinct / non_null >= HIGH_CARDINALITY_RATIO:
+        return "high_cardinality"
+    return ""
+
+
+def build_feature_catalog(jobs):
+    """Build feature catalog from Hive schema and data profile."""
+    profile = profile_features(jobs)
+    field_types = {field.name: field.dataType for field in jobs.schema.fields}
+    row_count = jobs.count()
+    threshold = int(row_count * COVERAGE_THRESHOLD)
+    rows = []
+    eligible = []
+    for feature, data_type in field_types.items():
+        group = feature_group(feature, data_type)
+        reason = is_excluded_before_selection(feature)
+        if not reason and group == "categorical":
+            reason = high_cardinality_reason(feature, profile)
+        if not reason and group == "time" and not is_time(feature):
+            reason = "leakage"
+        if not reason:
+            eligible.append(feature)
+        rows.append(
+            {
+                "feature": feature,
+                "feature_group": group,
+                "non_null_rows": int(profile[feature]["non_null"]),
+                "selection_threshold_rows": threshold,
+                "distinct_values": int(profile[feature]["distinct"]),
+                "selected": "yes" if not reason else "no",
+                "reason": reason or "eligible",
+            }
+        )
+    return rows, eligible
+
+
+def split_features_by_type(jobs, features):
+    """Split selected source columns by Spark SQL data type."""
+    field_types = {field.name: field.dataType for field in jobs.schema.fields}
+    categorical = []
+    numeric = []
+    time = []
+    geospatial = []
+    for feature in features:
+        data_type = field_types[feature]
+        if is_geospatial(feature):
+            geospatial.append(feature)
+        elif is_time(feature):
+            time.append(feature)
+        elif isinstance(data_type, NumericType):
+            numeric.append(feature)
+        elif isinstance(data_type, StringType):
+            categorical.append(feature)
+    return categorical, numeric, time, geospatial
+
+
+def select_variant_features(catalog, eligible, use_coverage):
+    """Apply source-column selection for one feature-set variant."""
+    if not use_coverage:
+        return eligible
+    return [
+        feature
+        for feature in eligible
+        if catalog[feature]["non_null_rows"] >= catalog[feature]["selection_threshold_rows"]
+    ]
+
+
+def save_feature_extraction(spark, catalog_rows, final_features):
+    """Save final feature extraction summary for dashboard compatibility."""
+    feature_rows = [
+        [
+            row["feature"],
+            row["feature_group"],
+            row["non_null_rows"],
+            row["selection_threshold_rows"],
+            row["distinct_values"],
+            "yes" if row["feature"] in final_features else "no",
+        ]
+        for row in catalog_rows
+    ]
+    (
+        spark.createDataFrame(
+            feature_rows,
+            [
+                "feature",
+                "feature_group",
+                "non_null_rows",
+                "selection_threshold_rows",
+                "distinct_values",
+                "selected",
+            ],
+        )
+        .coalesce(1)
+        .write.mode("overwrite")
+        .format("csv")
+        .option("sep", ",")
+        .option("header", "true")
+        .save("project/output/feature_extraction")
+    )
+    run(
+        "rm -f output/feature_extraction.csv && "
+        "hdfs dfs -cat project/output/feature_extraction/part* > "
+        "output/feature_extraction.csv"
+    )
+
+
+def save_feature_set_catalog(spark, catalog_rows):
+    """Save full source-column selection catalog."""
+    rows = [
+        [
+            row["feature"],
+            row["feature_group"],
+            row["non_null_rows"],
+            row["selection_threshold_rows"],
+            row["distinct_values"],
+            row["selected"],
+            row["reason"],
+        ]
+        for row in catalog_rows
+    ]
+    (
+        spark.createDataFrame(
+            rows,
+            [
+                "feature",
+                "feature_group",
+                "non_null_rows",
+                "selection_threshold_rows",
+                "distinct_values",
+                "selected",
+                "reason",
+            ],
+        )
+        .coalesce(1)
+        .write.mode("overwrite")
+        .format("csv")
+        .option("sep", ",")
+        .option("header", "true")
+        .save("project/output/feature_catalog")
+    )
+    run(
+        "rm -f output/feature_catalog.csv && "
+        "hdfs dfs -cat project/output/feature_catalog/part* > output/feature_catalog.csv"
+    )
+
+
+def build_feature_pipeline(categorical_cols, numeric_cols, time_cols, geo_cols, config):
+    """Build Spark ML feature extraction pipeline."""
+    stages = []
+    assembled_cols = []
+    if time_cols:
+        stages += [
+            DatePartsTransformer(time_cols[0]),
+            SinCosTransformer("filing_month", 12, "filing_month_sin", "filing_month_cos"),
+            SinCosTransformer("filing_day", 31, "filing_day_sin", "filing_day_cos"),
+        ]
+        assembled_cols += [
+            "filing_year",
+            "filing_month_sin",
+            "filing_month_cos",
+            "filing_day_sin",
+            "filing_day_cos",
+        ]
+    if len(geo_cols) == 2:
+        stages.append(GeoToECEFTransformer(geo_cols[0], geo_cols[1]))
+        assembled_cols += ["gis_x", "gis_y", "gis_z"]
+    indexers = [
+        StringIndexer(inputCol=column, outputCol=f"{column}_indexed").setHandleInvalid("keep")
+        for column in categorical_cols
+    ]
+    encoders = [
+        OneHotEncoder(
+            inputCol=indexer.getOutputCol(),
+            outputCol=f"{indexer.getOutputCol()}_encoded",
+        )
+        for indexer in indexers
+    ]
+    stages += indexers + encoders
+    assembled_cols = (
+        [encoder.getOutputCol() for encoder in encoders] + numeric_cols + assembled_cols
+    )
+    output_col = (
+        "features" if not config["variance"] and not config["chisq"] else "assembled_features"
+    )
+    assembler = VectorAssembler(
+        inputCols=assembled_cols,
+        outputCol=output_col,
+    )
+    stages.append(assembler)
+    if config["variance"]:
+        variance_output = "features" if not config["chisq"] else "variance_features"
+        stages.append(
+            VarianceThresholdSelector(
+                featuresCol="assembled_features",
+                outputCol=variance_output,
+                varianceThreshold=MIN_BINARY_VARIANCE,
+            )
+        )
+    if config["chisq"]:
+        chisq_input = "variance_features" if config["variance"] else "assembled_features"
+        stages.append(
+            ChiSqSelector(
+                numTopFeatures=CHISQ_TOP_FEATURES,
+                featuresCol=chisq_input,
+                outputCol="features",
+                labelCol="label",
+            )
+        )
+    return Pipeline(stages=stages)
+
+
+def save_json_split(dataset, hdfs_path, local_path):
+    """Save train or test split to HDFS and collect it locally."""
+    dataset.select("features", "label").coalesce(1).write.mode("overwrite").format("json").save(
+        hdfs_path
+    )
+    run(f"rm -f {local_path} && hdfs dfs -cat {hdfs_path}/part* > {local_path}")
+
+
+def save_predictions(predictions, hdfs_path, local_path):
+    """Save model predictions to HDFS and collect them locally."""
+    (
+        predictions.select("label", "prediction")
+        .coalesce(1)
+        .write.mode("overwrite")
+        .format("csv")
+        .option("sep", ",")
+        .option("header", "true")
+        .save(hdfs_path)
+    )
+    run(f"rm -f {local_path} && hdfs dfs -cat {hdfs_path}/part* > {local_path}")
+
+
+def evaluate(predictions, metric_name):
+    """Evaluate binary predictions with Spark ML evaluator."""
+    return BinaryClassificationEvaluator(
+        labelCol="label",
+        rawPredictionCol="rawPrediction",
+        metricName=metric_name,
+    ).evaluate(predictions)
+
+
+def train_logistic_regression(train_data, test_data, save_artifacts):
+    """Train Logistic Regression with cross-validation."""
+    model = LogisticRegression()
+    evaluator = BinaryClassificationEvaluator(
+        labelCol="label",
+        rawPredictionCol="rawPrediction",
+        metricName="areaUnderROC",
+    )
+    grid = (
+        ParamGridBuilder()
+        .addGrid(model.regParam, [0.0, 0.01, 0.1])
+        .addGrid(model.elasticNetParam, [0.0, 0.5, 1.0])
+        .build()
+    )
+    cv_model = CrossValidator(
+        estimator=model,
+        estimatorParamMaps=grid,
+        evaluator=evaluator,
+        parallelism=5,
+        numFolds=3,
+    ).fit(train_data)
+    best_model = cv_model.bestModel
+    predictions = best_model.transform(test_data)
+    if save_artifacts:
+        best_model.write().overwrite().save("project/models/model1")
+        run("rm -rf models/model1 && hdfs dfs -get project/models/model1 models/model1")
+        save_predictions(
+            predictions,
+            "project/output/model1_predictions",
+            "output/model1_predictions.csv",
+        )
+    return cv_model, grid, evaluate(predictions, "areaUnderROC"), evaluate(
+        predictions,
+        "areaUnderPR",
+    )
+
+
+def train_random_forest(train_data, test_data, save_artifacts):
+    """Train Random Forest with cross-validation."""
+    model = RandomForestClassifier()
+    evaluator = BinaryClassificationEvaluator(
+        labelCol="label",
+        rawPredictionCol="rawPrediction",
+        metricName="areaUnderROC",
+    )
+    grid = (
+        ParamGridBuilder()
+        .addGrid(model.numTrees, [10, 20, 30])
+        .addGrid(model.maxDepth, [5, 10, 15])
+        .build()
+    )
+    cv_model = CrossValidator(
+        estimator=model,
+        estimatorParamMaps=grid,
+        evaluator=evaluator,
+        parallelism=5,
+        numFolds=3,
+    ).fit(train_data)
+    best_model = cv_model.bestModel
+    predictions = best_model.transform(test_data)
+    if save_artifacts:
+        best_model.write().overwrite().save("project/models/model2")
+        run("rm -rf models/model2 && hdfs dfs -get project/models/model2 models/model2")
+        save_predictions(
+            predictions,
+            "project/output/model2_predictions",
+            "output/model2_predictions.csv",
+        )
+    return cv_model, grid, evaluate(predictions, "areaUnderROC"), evaluate(
+        predictions,
+        "areaUnderPR",
+    )
+
+
+def save_evaluation(spark, roc_lr, pr_lr, roc_rf, pr_rf):
+    """Save final model metrics."""
+    rows = [
+        ["LogisticRegression", float(roc_lr), float(pr_lr)],
+        ["RandomForestClassifier", float(roc_rf), float(pr_rf)],
+    ]
+    (
+        spark.createDataFrame(rows, ["model", "area_under_roc", "area_under_pr"])
+        .coalesce(1)
+        .write.mode("overwrite")
+        .format("csv")
+        .option("sep", ",")
+        .option("header", "true")
+        .save("project/output/evaluation")
+    )
+    run(
+        "rm -f output/evaluation.csv && "
+        "hdfs dfs -cat project/output/evaluation/part* > output/evaluation.csv"
+    )
+
+
+def save_feature_set_evaluation(spark, rows):
+    """Save evaluation metrics for all feature-set variants."""
+    (
+        spark.createDataFrame(
+            rows,
+            ["feature_set", "model", "area_under_roc", "area_under_pr"],
+        )
+        .coalesce(1)
+        .write.mode("overwrite")
+        .format("csv")
+        .option("sep", ",")
+        .option("header", "true")
+        .save("project/output/feature_set_evaluation")
+    )
+    run(
+        "rm -f output/feature_set_evaluation.csv && "
+        "hdfs dfs -cat project/output/feature_set_evaluation/part* > "
+        "output/feature_set_evaluation.csv"
+    )
+
 
 def get_param(param_map, name):
+    """Get parameter value from Spark ML parameter map."""
     values = [str(value) for param, value in param_map.items() if param.name == name]
     return values[0] if values else ""
 
-lr_best_metric = max(model1_cv.avgMetrics)
-rf_best_metric = max(model2_cv.avgMetrics)
-lr_rows = [["LogisticRegression", i + 1, get_param(param_map, "regParam"), get_param(param_map, "elasticNetParam"), "", "", float(model1_cv.avgMetrics[i]), "yes" if model1_cv.avgMetrics[i] == lr_best_metric else "no"] for i, param_map in enumerate(lr_grid)]
-rf_rows = [["RandomForestClassifier", i + 1, "", "", get_param(param_map, "numTrees"), get_param(param_map, "maxDepth"), float(model2_cv.avgMetrics[i]), "yes" if model2_cv.avgMetrics[i] == rf_best_metric else "no"] for i, param_map in enumerate(rf_grid)]
-spark.createDataFrame(lr_rows + rf_rows, ["model", "param_set", "reg_param", "elastic_net_param", "num_trees", "max_depth", "cv_area_under_roc", "is_best"]).coalesce(1).write.mode("overwrite").format("csv").option("sep", ",").option("header", "true").save("project/output/hyperparameter_results")
-run("rm -f output/hyperparameter_results.csv && hdfs dfs -cat project/output/hyperparameter_results/part* > output/hyperparameter_results.csv")
+
+def save_hyperparameter_results(spark, lr_cv, lr_grid, rf_cv, rf_grid):
+    """Save cross-validation results for all hyperparameter combinations."""
+    lr_best_metric = max(lr_cv.avgMetrics)
+    rf_best_metric = max(rf_cv.avgMetrics)
+    lr_rows = [
+        [
+            "LogisticRegression",
+            index + 1,
+            get_param(param_map, "regParam"),
+            get_param(param_map, "elasticNetParam"),
+            "",
+            "",
+            float(lr_cv.avgMetrics[index]),
+            "yes" if lr_cv.avgMetrics[index] == lr_best_metric else "no",
+        ]
+        for index, param_map in enumerate(lr_grid)
+    ]
+    rf_rows = [
+        [
+            "RandomForestClassifier",
+            index + 1,
+            "",
+            "",
+            get_param(param_map, "numTrees"),
+            get_param(param_map, "maxDepth"),
+            float(rf_cv.avgMetrics[index]),
+            "yes" if rf_cv.avgMetrics[index] == rf_best_metric else "no",
+        ]
+        for index, param_map in enumerate(rf_grid)
+    ]
+    (
+        spark.createDataFrame(
+            lr_rows + rf_rows,
+            [
+                "model",
+                "param_set",
+                "reg_param",
+                "elastic_net_param",
+                "num_trees",
+                "max_depth",
+                "cv_area_under_roc",
+                "is_best",
+            ],
+        )
+        .coalesce(1)
+        .write.mode("overwrite")
+        .format("csv")
+        .option("sep", ",")
+        .option("header", "true")
+        .save("project/output/hyperparameter_results")
+    )
+    run(
+        "rm -f output/hyperparameter_results.csv && "
+        "hdfs dfs -cat project/output/hyperparameter_results/part* > "
+        "output/hyperparameter_results.csv"
+    )
+
+
+def build_hyperparameter_rows(feature_set, lr_cv, lr_grid, rf_cv, rf_grid):
+    """Build cross-validation rows for one feature-set variant."""
+    lr_best_metric = max(lr_cv.avgMetrics)
+    rf_best_metric = max(rf_cv.avgMetrics)
+    lr_rows = [
+        [
+            feature_set,
+            "LogisticRegression",
+            index + 1,
+            get_param(param_map, "regParam"),
+            get_param(param_map, "elasticNetParam"),
+            "",
+            "",
+            float(lr_cv.avgMetrics[index]),
+            "yes" if lr_cv.avgMetrics[index] == lr_best_metric else "no",
+        ]
+        for index, param_map in enumerate(lr_grid)
+    ]
+    rf_rows = [
+        [
+            feature_set,
+            "RandomForestClassifier",
+            index + 1,
+            "",
+            "",
+            get_param(param_map, "numTrees"),
+            get_param(param_map, "maxDepth"),
+            float(rf_cv.avgMetrics[index]),
+            "yes" if rf_cv.avgMetrics[index] == rf_best_metric else "no",
+        ]
+        for index, param_map in enumerate(rf_grid)
+    ]
+    return lr_rows + rf_rows
+
+
+def save_feature_set_hyperparameter_results(spark, rows):
+    """Save cross-validation results for all feature-set variants."""
+    (
+        spark.createDataFrame(
+            rows,
+            [
+                "feature_set",
+                "model",
+                "param_set",
+                "reg_param",
+                "elastic_net_param",
+                "num_trees",
+                "max_depth",
+                "cv_area_under_roc",
+                "is_best",
+            ],
+        )
+        .coalesce(1)
+        .write.mode("overwrite")
+        .format("csv")
+        .option("sep", ",")
+        .option("header", "true")
+        .save("project/output/feature_set_hyperparameter_results")
+    )
+    run(
+        "rm -f output/feature_set_hyperparameter_results.csv && "
+        "hdfs dfs -cat project/output/feature_set_hyperparameter_results/part* > "
+        "output/feature_set_hyperparameter_results.csv"
+    )
+
+
+def fill_missing_values(jobs, categorical_cols, numeric_cols, time_cols, geo_cols):
+    """Fill missing values before vector assembly."""
+    for column in categorical_cols:
+        jobs = jobs.withColumn(column, F.coalesce(F.col(column).cast("string"), F.lit("missing")))
+    for column in numeric_cols + geo_cols:
+        jobs = jobs.withColumn(column, F.coalesce(F.col(column).cast("double"), F.lit(0.0)))
+    for column in time_cols:
+        jobs = jobs.withColumn(column, F.to_timestamp(column))
+    return jobs
+
+
+def prepare_modeling_data(jobs, selected_features, config):
+    """Build feature vectors and stratified train/test split."""
+    jobs = jobs.select(selected_features + [LABEL])
+    categorical_cols, numeric_cols, time_cols, geo_cols = split_features_by_type(
+        jobs,
+        selected_features,
+    )
+    jobs = fill_missing_values(jobs, categorical_cols, numeric_cols, time_cols, geo_cols)
+    jobs = jobs.withColumn(
+        "label",
+        F.when(F.col(LABEL) == "P", F.lit(1.0)).otherwise(F.lit(0.0)),
+    )
+    pipeline_model = build_feature_pipeline(
+        categorical_cols,
+        numeric_cols,
+        time_cols,
+        geo_cols,
+        config,
+    ).fit(jobs)
+    data = pipeline_model.transform(jobs).select(["features", "label"])
+    feature_indexer = VectorIndexer(
+        inputCol="features",
+        outputCol="indexedFeatures",
+        maxCategories=4,
+    ).fit(data)
+    transformed = feature_indexer.transform(data).withColumn(
+        "row_id",
+        F.monotonically_increasing_id(),
+    )
+    train_data = transformed.sampleBy(
+        "label",
+        fractions={0.0: 0.7, 1.0: 0.7},
+        seed=10,
+    )
+    test_data = transformed.join(
+        train_data.select("row_id"),
+        on="row_id",
+        how="left_anti",
+    ).drop("row_id")
+    return train_data.drop("row_id"), test_data
+
+
+def train_models(train_data, test_data, save_artifacts):
+    """Train both model families for one feature set."""
+    lr_cv, lr_grid, roc_lr, pr_lr = train_logistic_regression(
+        train_data,
+        test_data,
+        save_artifacts,
+    )
+    rf_cv, rf_grid, roc_rf, pr_rf = train_random_forest(
+        train_data,
+        test_data,
+        save_artifacts,
+    )
+    return {
+        "lr_cv": lr_cv,
+        "lr_grid": lr_grid,
+        "rf_cv": rf_cv,
+        "rf_grid": rf_grid,
+        "roc_lr": roc_lr,
+        "pr_lr": pr_lr,
+        "roc_rf": roc_rf,
+        "pr_rf": pr_rf,
+    }
+
+
+def run_feature_set(jobs, catalog, eligible_features, config):
+    """Train both models for one feature-set variant."""
+    feature_set = config["name"]
+    selected_features = select_variant_features(
+        catalog,
+        eligible_features,
+        config["coverage"],
+    )
+    train_data, test_data = prepare_modeling_data(jobs, selected_features, config)
+    save_artifacts = feature_set == FINAL_FEATURE_SET
+    if save_artifacts:
+        save_json_split(train_data, "project/data/train", "data/train.json")
+        save_json_split(test_data, "project/data/test", "data/test.json")
+    model_results = train_models(train_data, test_data, save_artifacts)
+    return {
+        "feature_set": feature_set,
+        "features": selected_features,
+        "evaluation": [
+            [
+                feature_set,
+                "LogisticRegression",
+                float(model_results["roc_lr"]),
+                float(model_results["pr_lr"]),
+            ],
+            [
+                feature_set,
+                "RandomForestClassifier",
+                float(model_results["roc_rf"]),
+                float(model_results["pr_rf"]),
+            ],
+        ],
+        "hyperparameters": build_hyperparameter_rows(
+            feature_set,
+            model_results["lr_cv"],
+            model_results["lr_grid"],
+            model_results["rf_cv"],
+            model_results["rf_grid"],
+        ),
+        "final": model_results,
+    }
+
+
+def save_final_outputs(spark, final_result):
+    """Save dashboard-compatible final model outputs."""
+    save_evaluation(
+        spark,
+        final_result["roc_lr"],
+        final_result["pr_lr"],
+        final_result["roc_rf"],
+        final_result["pr_rf"],
+    )
+    save_hyperparameter_results(
+        spark,
+        final_result["lr_cv"],
+        final_result["lr_grid"],
+        final_result["rf_cv"],
+        final_result["rf_grid"],
+    )
+
+
+def main():
+    """Run the complete Stage 3 modeling workflow."""
+    spark = build_spark_session()
+    jobs = spark.table(HIVE_TABLE)
+    jobs = jobs.filter(F.col(LABEL).isin("P", "J"))
+    catalog_rows, eligible_features = build_feature_catalog(jobs)
+    catalog = {row["feature"]: row for row in catalog_rows}
+    save_feature_set_catalog(spark, catalog_rows)
+    all_evaluation_rows = []
+    all_hyperparameter_rows = []
+    final_results = None
+    final_features = []
+    for config in FEATURE_SET_CONFIGS:
+        result = run_feature_set(jobs, catalog, eligible_features, config)
+        all_evaluation_rows += result["evaluation"]
+        all_hyperparameter_rows += result["hyperparameters"]
+        if result["feature_set"] == FINAL_FEATURE_SET:
+            final_features = result["features"]
+            final_results = result["final"]
+    save_feature_extraction(spark, catalog_rows, final_features)
+    save_feature_set_evaluation(spark, all_evaluation_rows)
+    save_feature_set_hyperparameter_results(spark, all_hyperparameter_rows)
+    save_final_outputs(spark, final_results)
+
+
+if __name__ == "__main__":
+    main()

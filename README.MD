@@ -81,37 +81,51 @@ The final model comparison is saved to `output/evaluation.csv`.
 
 ## Feature Selection
 
-The original dataset has more columns than the modeling stage uses. The first reduction is manual domain-based preselection: fields are kept only if they can describe an application before the final plan examination outcome is known and can be represented reasonably in Spark ML.
+The modeling stage starts from the prepared Hive table schema. Before automatic feature selection, the code excludes only the target itself and process-leakage fields that describe the decision process after the filing is already moving through DOB review.
 
-The initial candidate feature set is:
+The target fields are excluded because they directly contain the answer:
 
-`borough`, `job_type`, `professional_cert`, `owner_type`, `building_class`, `existing_occupancy`, `proposed_occupancy`, `landmarked`, `pc_filed`, `efiling_filed`, `plumbing`, `mechanical`, `boiler`, `sprinkler`, `fire_alarm`, `equipment`, `fire_suppression`, `curb_cut`, `initial_cost`, `total_est_fee`, `existing_zoning_sqft`, `proposed_zoning_sqft`, `enlargement_sqft`, `street_frontage`, `proposed_no_of_stories`, `proposed_height`, `proposed_dwelling_units`, `total_construction_floor_area`, `pre_filing_date`, `gis_latitude`, `gis_longitude`.
+- `job_status` is the binary label used for prediction.
+- `job_status_descr` is the text description of the same status.
 
-After this preselection, `scripts/modeling.py` applies automatic selection rules:
+The leakage fields are excluded because they describe downstream workflow state, payments, assignment, approval, signoff, withdrawal, or later DOB action dates:
 
-- keep features with at least 50% non-null values in the binary `P/J` subset;
-- for categorical features, also require at least two distinct values after filtering.
+- `latest_action_date` records the latest status/action date and can summarize process progress.
+- `paid` records payment timing after the filing enters the process.
+- `fully_paid` records completed payment timing.
+- `assigned` records assignment to review workflow.
+- `approved` records the approval date, which directly leaks the positive outcome.
+- `fully_permitted` records a later permitting milestone after approval workflow.
+- `signoff_date` records signoff after review/permitting progress.
+- `special_action_status` records a special administrative action state.
+- `special_action_date` records the date of that special administrative action.
+- `withdrawal_flag` records whether the filing was withdrawn during the process.
+- `fee_status` records fee/payment state after filing.
+- `job_no_good_count` records DOB process/problem status rather than a stable pre-review application attribute.
+- `dobrundate` records dataset processing/update timing rather than an application attribute.
 
-The actual selected and dropped features are saved to:
+All other columns remain eligible candidates. Names, addresses, IDs, phone numbers, free-text fields, zoning descriptors, work-scope flags, ownership fields, and building descriptors are not manually removed. They are removed only if an automatic selector rejects them.
+
+The remaining candidate columns are converted by type: categorical fields are indexed and one-hot encoded, numerical fields are assembled directly, the filing date is decomposed into cyclical date features, and latitude/longitude are converted into geospatial coordinates.
+
+The code then compares several automatic feature-selection variants:
+
+- all eligible structured features;
+- the same feature set after `VarianceThresholdSelector` with threshold `0.05`;
+- features with at least 50% non-null coverage, followed by `VarianceThresholdSelector`;
+- the coverage and variance-selected feature set followed by chi-square supervised selection.
+
+The dashboard-compatible final feature summary is saved to:
 
 ```text
 output/feature_extraction.csv
 ```
 
-The remaining source columns are excluded for the following reasons:
+The full source-column catalog with exclusion reasons is saved to:
 
-- Target fields: `job_status`, `job_status_descr`.
-- Row identifiers and import metadata: `fact_id`, `job_number`, `doc_number`, `bin_number`, `gis_bin`, `job_s1_no`, `created_at`.
-- Address and parcel identifiers: `house_number`, `street_name`, `block`, `lot`.
-- Applicant and owner identity fields: `applicant_first_name`, `applicant_last_name`, `applicant_license`, `owner_first_name`, `owner_last_name`, `owner_business_name`, `owner_house_number`, `owner_house_street_name`, `owner_phone`.
-- Free-text fields: `other_description`, `job_description`.
-- Post-filing or post-decision dates that can leak process progress or outcome information: `latest_action_date`, `paid`, `fully_paid`, `assigned`, `approved`, `fully_permitted`, `signoff_date`, `special_action_date`, `dobrundate`.
-- Administrative status fields that duplicate process state or are not stable pre-decision predictors: `fee_status`, `withdrawal_flag`, `special_action_status`, `job_no_good_count`.
-- Sparse or highly specific work-scope flags not retained in the initial candidate set: `adult_estab`, `loft_board`, `city_owned`, `little_e`, `fuel_burning`, `fuel_storage`, `standpipe`, `other`.
-- Zoning, district, and location descriptors that are sparse, too granular, or represented by selected fields: `building_type`, `community_board`, `cluster`, `site_fill`, `zoning_dist1`, `zoning_dist2`, `zoning_dist3`, `special_district1`, `special_district2`, `gis_council_district`, `gis_census_tract`, `gis_nta_name`.
-- Owner address fields: `city`, `state`, `zip`.
-- Applicant title and nonprofit flag: `applicant_professional_title`, `non_profit`.
-- Existing-size fields that duplicate proposed-size and change-size fields already retained: `horizontal_enlrgmt`, `vertical_enlrgmt`, `existing_no_of_stories`, `existing_height`, `existing_dwelling_units`.
+```text
+output/feature_catalog.csv
+```
 
 ## Stage 3 Outputs
 
@@ -126,6 +140,9 @@ The modeling stage writes these local artifacts:
 - `output/evaluation.csv` — final model metrics
 - `output/feature_extraction.csv` — feature extraction and feature selection summary
 - `output/hyperparameter_results.csv` — cross-validation results for all tested hyperparameter configurations
+- `output/feature_catalog.csv` — source-column profiling and exclusion reasons
+- `output/feature_set_evaluation.csv` — model metrics for each feature-selection variant
+- `output/feature_set_hyperparameter_results.csv` — hyperparameter tuning results for each feature-selection variant
 
 The same modeling outputs are also stored in HDFS under `project/data`, `project/models`, and `project/output`.
 
