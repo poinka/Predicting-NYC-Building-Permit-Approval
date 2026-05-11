@@ -116,7 +116,7 @@ def run(command):
 
 def build_spark_session():
     """Create Spark session connected to Hive metastore."""
-    return (
+    spark = (
         SparkSession.builder.appName(f"{TEAM} - spark ML")
         .master("yarn")
         .config("hive.metastore.uris", "thrift://hadoop-02.uni.innopolis.ru:9883")
@@ -125,6 +125,8 @@ def build_spark_session():
         .enableHiveSupport()
         .getOrCreate()
     )
+    spark.sparkContext.setLogLevel("WARN")
+    return spark
 
 
 def is_geospatial(feature):
