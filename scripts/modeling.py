@@ -10,6 +10,7 @@ from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.ml.feature import (
     ChiSqSelector,
     OneHotEncoder,
+    QuantileDiscretizer,
     StringIndexer,
     VarianceThresholdSelector,
     VectorAssembler,
@@ -29,6 +30,7 @@ MIN_BINARY_VARIANCE = 0.05
 HIGH_CARDINALITY_RATIO = 0.8
 HIGH_CARDINALITY_LIMIT = 500
 CHISQ_TOP_FEATURES = 50
+CHISQ_BUCKETS = 16
 FINAL_FEATURE_SET = "coverage_variance_chisq"
 
 TARGET_COLUMNS = {LABEL, "job_status_descr"}
@@ -336,13 +338,14 @@ def build_feature_pipeline(categorical_cols, numeric_cols, time_cols, geo_cols, 
     """Build Spark ML feature extraction pipeline."""
     stages = []
     assembled_cols = []
+    continuous_cols = []
     if time_cols:
         stages += [
             DatePartsTransformer(time_cols[0]),
             SinCosTransformer("filing_month", 12, "filing_month_sin", "filing_month_cos"),
             SinCosTransformer("filing_day", 31, "filing_day_sin", "filing_day_cos"),
         ]
-        assembled_cols += [
+        continuous_cols += [
             "filing_year",
             "filing_month_sin",
             "filing_month_cos",
@@ -351,7 +354,7 @@ def build_feature_pipeline(categorical_cols, numeric_cols, time_cols, geo_cols, 
         ]
     if len(geo_cols) == 2:
         stages.append(GeoToECEFTransformer(geo_cols[0], geo_cols[1]))
-        assembled_cols += ["gis_x", "gis_y", "gis_z"]
+        continuous_cols += ["gis_x", "gis_y", "gis_z"]
     indexers = [
         StringIndexer(inputCol=column, outputCol=f"{column}_indexed").setHandleInvalid("keep")
         for column in categorical_cols
@@ -364,8 +367,21 @@ def build_feature_pipeline(categorical_cols, numeric_cols, time_cols, geo_cols, 
         for indexer in indexers
     ]
     stages += indexers + encoders
+    continuous_cols = numeric_cols + continuous_cols
+    if config["chisq"]:
+        discretized_cols = [f"{column}_bucket" for column in continuous_cols]
+        stages += [
+            QuantileDiscretizer(
+                inputCol=column,
+                outputCol=f"{column}_bucket",
+                numBuckets=CHISQ_BUCKETS,
+                handleInvalid="keep",
+            )
+            for column in continuous_cols
+        ]
+        continuous_cols = discretized_cols
     assembled_cols = (
-        [encoder.getOutputCol() for encoder in encoders] + numeric_cols + assembled_cols
+        [encoder.getOutputCol() for encoder in encoders] + continuous_cols
     )
     output_col = (
         "features" if not config["variance"] and not config["chisq"] else "assembled_features"
