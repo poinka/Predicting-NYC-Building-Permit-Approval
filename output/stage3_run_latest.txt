@@ -1,0 +1,840 @@
+===== Stage 3: Spark ML on YARN =====
+
+START: Spark ML
+2026-05-11 17:54:01,307 INFO spark.SparkContext: Running Spark version 3.2.4
+2026-05-11 17:54:01,445 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2026-05-11 17:54:01,533 INFO resource.ResourceUtils: ==============================================================
+2026-05-11 17:54:01,533 INFO resource.ResourceUtils: No custom resources configured for spark.driver.
+2026-05-11 17:54:01,534 INFO resource.ResourceUtils: ==============================================================
+2026-05-11 17:54:01,534 INFO spark.SparkContext: Submitted application: team13 - spark ML
+2026-05-11 17:54:01,569 INFO resource.ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 1, script: , vendor: , memory -> name: memory, amount: 1024, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+2026-05-11 17:54:01,585 INFO resource.ResourceProfile: Limiting resource is cpus at 1 tasks per executor
+2026-05-11 17:54:01,587 INFO resource.ResourceProfileManager: Added ResourceProfile id: 0
+2026-05-11 17:54:01,638 INFO spark.SecurityManager: Changing view acls to: team13
+2026-05-11 17:54:01,638 INFO spark.SecurityManager: Changing modify acls to: team13
+2026-05-11 17:54:01,638 INFO spark.SecurityManager: Changing view acls groups to: 
+2026-05-11 17:54:01,639 INFO spark.SecurityManager: Changing modify acls groups to: 
+2026-05-11 17:54:01,639 INFO spark.SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users  with view permissions: Set(team13); groups with view permissions: Set(); users  with modify permissions: Set(team13); groups with modify permissions: Set()
+2026-05-11 17:54:01,970 INFO util.Utils: Successfully started service 'sparkDriver' on port 33759.
+2026-05-11 17:54:02,003 INFO spark.SparkEnv: Registering MapOutputTracker
+2026-05-11 17:54:02,032 INFO spark.SparkEnv: Registering BlockManagerMaster
+2026-05-11 17:54:02,051 INFO storage.BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+2026-05-11 17:54:02,051 INFO storage.BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+2026-05-11 17:54:02,099 INFO spark.SparkEnv: Registering BlockManagerMasterHeartbeat
+2026-05-11 17:54:02,123 INFO storage.DiskBlockManager: Created local directory at /tmp/blockmgr-bf85d436-8fcb-4b8c-bd4f-e92937e38c83
+2026-05-11 17:54:02,148 INFO memory.MemoryStore: MemoryStore started with capacity 366.3 MiB
+2026-05-11 17:54:02,183 INFO spark.SparkEnv: Registering OutputCommitCoordinator
+2026-05-11 17:54:02,285 INFO util.log: Logging initialized @3518ms to org.sparkproject.jetty.util.log.Slf4jLog
+2026-05-11 17:54:02,370 INFO server.Server: jetty-9.4.44.v20210927; built: 2021-09-27T23:02:44.612Z; git: 8da83308eeca865e495e53ef315a249d63ba9332; jvm 1.8.0_402-b06
+2026-05-11 17:54:02,396 INFO server.Server: Started @3631ms
+2026-05-11 17:54:02,424 WARN util.Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
+2026-05-11 17:54:02,425 WARN util.Utils: Service 'SparkUI' could not bind on port 4041. Attempting port 4042.
+2026-05-11 17:54:02,436 INFO server.AbstractConnector: Started ServerConnector@78deec17{HTTP/1.1, (http/1.1)}{0.0.0.0:4042}
+2026-05-11 17:54:02,436 INFO util.Utils: Successfully started service 'SparkUI' on port 4042.
+2026-05-11 17:54:02,497 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@5f63f8a1{/jobs,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,500 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@5db3fa84{/jobs/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,501 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@72853942{/jobs/job,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,504 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@3099040d{/jobs/job/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,505 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@5f308b17{/stages,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,506 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@27847c28{/stages/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,506 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@17599624{/stages/stage,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,508 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@207d8486{/stages/stage/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,509 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@2ebf52e6{/stages/pool,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,510 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@6f4266a9{/stages/pool/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,511 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@7720bce6{/storage,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,512 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@141c59f1{/storage/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,512 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@2221fcb9{/storage/rdd,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,513 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@428b545{/storage/rdd/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,514 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@5cce149d{/environment,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,519 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@2565583{/environment/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,519 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@6028f65b{/executors,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,520 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@390fd29b{/executors/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,520 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@21ae936b{/executors/threadDump,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,521 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@44366c53{/executors/threadDump/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,530 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@ee46b1e{/static,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,530 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@517e59bc{/,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,532 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@3dac5117{/api,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,532 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@290a942{/jobs/job/kill,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,533 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@71ad3375{/stages/stage/kill,null,AVAILABLE,@Spark}
+2026-05-11 17:54:02,535 INFO ui.SparkUI: Bound SparkUI to 0.0.0.0, and started at http://hadoop-01.uni.innopolis.ru:4042
+2026-05-11 17:54:03,004 INFO client.DefaultNoHARMFailoverProxyProvider: Connecting to ResourceManager at hadoop-03.uni.innopolis.ru/10.100.30.59:8032
+2026-05-11 17:54:03,186 INFO client.AHSProxy: Connecting to Application History server at hadoop-04.uni.innopolis.ru/10.100.30.60:10200
+2026-05-11 17:54:03,277 INFO yarn.Client: Requesting a new application from cluster with 3 NodeManagers
+2026-05-11 17:54:03,732 WARN shortcircuit.DomainSocketFactory: The short-circuit local reads feature cannot be used because libhadoop cannot be loaded.
+2026-05-11 17:54:03,778 INFO conf.Configuration: resource-types.xml not found
+2026-05-11 17:54:03,778 INFO resource.ResourceUtils: Unable to find 'resource-types.xml'.
+2026-05-11 17:54:03,788 INFO yarn.Client: Verifying our application has not requested more than the maximum memory capability of the cluster (15000 MB per container)
+2026-05-11 17:54:03,789 INFO yarn.Client: Will allocate AM container, with 896 MB memory including 384 MB overhead
+2026-05-11 17:54:03,789 INFO yarn.Client: Setting up container launch context for our AM
+2026-05-11 17:54:03,790 INFO yarn.Client: Setting up the launch environment for our AM container
+2026-05-11 17:54:03,796 INFO yarn.Client: Preparing resources for our AM container
+2026-05-11 17:54:03,844 WARN yarn.Client: Neither spark.yarn.jars nor spark.yarn.archive is set, falling back to uploading libraries under SPARK_HOME.
+2026-05-11 17:54:08,253 INFO yarn.Client: Uploading resource file:/tmp/spark-2129ce23-fb55-4b99-b28c-9e350ce2d295/__spark_libs__1074467393103835583.zip -> hdfs://hadoop-02.uni.innopolis.ru:8020/user/team13/.sparkStaging/application_1777989965680_8541/__spark_libs__1074467393103835583.zip
+2026-05-11 17:54:09,486 INFO yarn.Client: Uploading resource file:/usr/local/lib/python3.6/site-packages/pyspark/python/lib/pyspark.zip -> hdfs://hadoop-02.uni.innopolis.ru:8020/user/team13/.sparkStaging/application_1777989965680_8541/pyspark.zip
+2026-05-11 17:54:12,188 INFO yarn.Client: Uploading resource file:/usr/local/lib/python3.6/site-packages/pyspark/python/lib/py4j-0.10.9.5-src.zip -> hdfs://hadoop-02.uni.innopolis.ru:8020/user/team13/.sparkStaging/application_1777989965680_8541/py4j-0.10.9.5-src.zip
+2026-05-11 17:54:12,403 INFO yarn.Client: Uploading resource file:/tmp/spark-2129ce23-fb55-4b99-b28c-9e350ce2d295/__spark_conf__848429647999903022.zip -> hdfs://hadoop-02.uni.innopolis.ru:8020/user/team13/.sparkStaging/application_1777989965680_8541/__spark_conf__.zip
+2026-05-11 17:54:12,457 INFO spark.SecurityManager: Changing view acls to: team13
+2026-05-11 17:54:12,457 INFO spark.SecurityManager: Changing modify acls to: team13
+2026-05-11 17:54:12,457 INFO spark.SecurityManager: Changing view acls groups to: 
+2026-05-11 17:54:12,457 INFO spark.SecurityManager: Changing modify acls groups to: 
+2026-05-11 17:54:12,457 INFO spark.SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users  with view permissions: Set(team13); groups with view permissions: Set(); users  with modify permissions: Set(team13); groups with modify permissions: Set()
+2026-05-11 17:54:12,473 INFO yarn.Client: Submitting application application_1777989965680_8541 to ResourceManager
+2026-05-11 17:54:12,505 INFO impl.YarnClientImpl: Submitted application application_1777989965680_8541
+2026-05-11 17:54:13,508 INFO yarn.Client: Application report for application_1777989965680_8541 (state: ACCEPTED)
+2026-05-11 17:54:13,512 INFO yarn.Client: 
+	 client token: N/A
+	 diagnostics: AM container is launched, waiting for AM container to Register with RM
+	 ApplicationMaster host: N/A
+	 ApplicationMaster RPC port: -1
+	 queue: teams
+	 start time: 1778511252484
+	 final status: UNDEFINED
+	 tracking URL: http://hadoop-03.uni.innopolis.ru:8088/proxy/application_1777989965680_8541/
+	 user: team13
+2026-05-11 17:54:14,514 INFO yarn.Client: Application report for application_1777989965680_8541 (state: ACCEPTED)
+2026-05-11 17:54:15,515 INFO yarn.Client: Application report for application_1777989965680_8541 (state: ACCEPTED)
+2026-05-11 17:54:16,264 INFO cluster.YarnClientSchedulerBackend: Add WebUI Filter. org.apache.hadoop.yarn.server.webproxy.amfilter.AmIpFilter, Map(PROXY_HOSTS -> hadoop-03.uni.innopolis.ru, PROXY_URI_BASES -> http://hadoop-03.uni.innopolis.ru:8088/proxy/application_1777989965680_8541), /proxy/application_1777989965680_8541
+2026-05-11 17:54:16,517 INFO yarn.Client: Application report for application_1777989965680_8541 (state: RUNNING)
+2026-05-11 17:54:16,517 INFO yarn.Client: 
+	 client token: N/A
+	 diagnostics: N/A
+	 ApplicationMaster host: 10.100.30.58
+	 ApplicationMaster RPC port: -1
+	 queue: teams
+	 start time: 1778511252484
+	 final status: UNDEFINED
+	 tracking URL: http://hadoop-03.uni.innopolis.ru:8088/proxy/application_1777989965680_8541/
+	 user: team13
+2026-05-11 17:54:16,519 INFO cluster.YarnClientSchedulerBackend: Application application_1777989965680_8541 has started running.
+2026-05-11 17:54:16,531 INFO util.Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 38319.
+2026-05-11 17:54:16,531 INFO netty.NettyBlockTransferService: Server created on hadoop-01.uni.innopolis.ru:38319
+2026-05-11 17:54:16,532 INFO storage.BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+2026-05-11 17:54:16,544 INFO storage.BlockManagerMaster: Registering BlockManager BlockManagerId(driver, hadoop-01.uni.innopolis.ru, 38319, None)
+2026-05-11 17:54:16,548 INFO storage.BlockManagerMasterEndpoint: Registering block manager hadoop-01.uni.innopolis.ru:38319 with 366.3 MiB RAM, BlockManagerId(driver, hadoop-01.uni.innopolis.ru, 38319, None)
+2026-05-11 17:54:16,554 INFO storage.BlockManagerMaster: Registered BlockManager BlockManagerId(driver, hadoop-01.uni.innopolis.ru, 38319, None)
+2026-05-11 17:54:16,555 INFO storage.BlockManager: Initialized BlockManager: BlockManagerId(driver, hadoop-01.uni.innopolis.ru, 38319, None)
+2026-05-11 17:54:16,720 INFO ui.ServerInfo: Adding filter to /metrics/json: org.apache.hadoop.yarn.server.webproxy.amfilter.AmIpFilter
+2026-05-11 17:54:16,722 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@20b8d611{/metrics/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:16,936 INFO cluster.YarnSchedulerBackend$YarnSchedulerEndpoint: ApplicationMaster registered as NettyRpcEndpointRef(spark-client://YarnAM)
+2026-05-11 17:54:20,588 INFO cluster.YarnSchedulerBackend$YarnDriverEndpoint: Registered executor NettyRpcEndpointRef(spark-client://Executor) (10.100.30.58:41276) with ID 2,  ResourceProfileId 0
+2026-05-11 17:54:20,702 INFO storage.BlockManagerMasterEndpoint: Registering block manager hadoop-02.uni.innopolis.ru:34706 with 366.3 MiB RAM, BlockManagerId(2, hadoop-02.uni.innopolis.ru, 34706, None)
+2026-05-11 17:54:24,628 INFO cluster.YarnSchedulerBackend$YarnDriverEndpoint: Registered executor NettyRpcEndpointRef(spark-client://Executor) (10.100.30.60:43618) with ID 1,  ResourceProfileId 0
+2026-05-11 17:54:24,665 INFO cluster.YarnClientSchedulerBackend: SchedulerBackend is ready for scheduling beginning after reached minRegisteredResourcesRatio: 0.8
+/usr/local/lib/python3.6/site-packages/pyspark/python/lib/pyspark.zip/pyspark/context.py:238: FutureWarning: Python 3.6 support is deprecated in Spark 3.2.
+  FutureWarning
+2026-05-11 17:54:24,732 INFO storage.BlockManagerMasterEndpoint: Registering block manager hadoop-04.uni.innopolis.ru:39271 with 366.3 MiB RAM, BlockManagerId(1, hadoop-04.uni.innopolis.ru, 39271, None)
+2026-05-11 17:54:24,841 INFO internal.SharedState: Setting hive.metastore.warehouse.dir ('null') to the value of spark.sql.warehouse.dir.
+2026-05-11 17:54:24,845 INFO internal.SharedState: Warehouse path is 'hdfs://hadoop-02.uni.innopolis.ru:8020/user/team13/project/hive/warehouse'.
+2026-05-11 17:54:24,858 INFO ui.ServerInfo: Adding filter to /SQL: org.apache.hadoop.yarn.server.webproxy.amfilter.AmIpFilter
+2026-05-11 17:54:24,859 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@5ad756d5{/SQL,null,AVAILABLE,@Spark}
+2026-05-11 17:54:24,859 INFO ui.ServerInfo: Adding filter to /SQL/json: org.apache.hadoop.yarn.server.webproxy.amfilter.AmIpFilter
+2026-05-11 17:54:24,860 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@558b05f{/SQL/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:24,860 INFO ui.ServerInfo: Adding filter to /SQL/execution: org.apache.hadoop.yarn.server.webproxy.amfilter.AmIpFilter
+2026-05-11 17:54:24,861 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@2174f01{/SQL/execution,null,AVAILABLE,@Spark}
+2026-05-11 17:54:24,861 INFO ui.ServerInfo: Adding filter to /SQL/execution/json: org.apache.hadoop.yarn.server.webproxy.amfilter.AmIpFilter
+2026-05-11 17:54:24,862 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@19f421b5{/SQL/execution/json,null,AVAILABLE,@Spark}
+2026-05-11 17:54:24,863 INFO ui.ServerInfo: Adding filter to /static/sql: org.apache.hadoop.yarn.server.webproxy.amfilter.AmIpFilter
+2026-05-11 17:54:24,864 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@528fb0fb{/static/sql,null,AVAILABLE,@Spark}
+2026-05-11 17:54:29,606 WARN util.package: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
+2026-05-11 17:54:30,697 WARN session.SessionState: METASTORE_FILTER_HOOK will be ignored, since hive.security.authorization.manager is set to instance of HiveAuthorizerFactory.
+2026-05-11 17:54:31,260 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1503.6 KiB
+2026-05-11 17:54:45,629 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 17:56:39,004 WARN netlib.InstanceBuilder$NativeBLAS: Failed to load implementation from:dev.ludovic.netlib.blas.JNIBLAS
+2026-05-11 17:56:39,016 WARN netlib.InstanceBuilder$NativeBLAS: Failed to load implementation from:dev.ludovic.netlib.blas.ForeignLinkerBLAS
+2026-05-11 17:56:39,043 WARN netlib.BLAS: Failed to load implementation from: com.github.fommil.netlib.NativeSystemBLAS
+2026-05-11 17:56:39,043 WARN netlib.BLAS: Failed to load implementation from: com.github.fommil.netlib.NativeRefBLAS
+2026-05-11 18:04:34,827 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1004.8 KiB
+2026-05-11 18:04:36,893 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1004.8 KiB
+2026-05-11 18:04:38,627 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1065.1 KiB
+2026-05-11 18:04:42,174 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1004.9 KiB
+2026-05-11 18:04:44,088 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1004.9 KiB
+2026-05-11 18:04:44,321 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1065.1 KiB
+2026-05-11 18:04:44,654 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1167.4 KiB
+2026-05-11 18:04:46,293 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1057.9 KiB
+2026-05-11 18:04:49,468 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1057.9 KiB
+2026-05-11 18:04:50,361 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1332.4 KiB
+2026-05-11 18:04:51,464 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1006.1 KiB
+2026-05-11 18:04:52,181 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1142.5 KiB
+2026-05-11 18:04:55,679 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1142.5 KiB
+2026-05-11 18:04:56,921 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1584.7 KiB
+2026-05-11 18:05:05,752 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1271.8 KiB
+2026-05-11 18:05:07,145 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1004.9 KiB
+2026-05-11 18:05:09,228 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1271.8 KiB
+2026-05-11 18:05:10,879 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1948.5 KiB
+2026-05-11 18:05:15,916 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1454.5 KiB
+2026-05-11 18:05:19,535 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1454.5 KiB
+2026-05-11 18:05:20,248 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:05:22,830 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1703.0 KiB
+2026-05-11 18:05:26,083 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1703.0 KiB
+2026-05-11 18:05:29,228 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1751.9 KiB
+2026-05-11 18:05:30,368 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2044.2 KiB
+2026-05-11 18:05:34,489 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1330.6 KiB
+2026-05-11 18:05:37,422 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:05:41,594 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.0 MiB
+2026-05-11 18:05:47,202 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.6 MiB
+2026-05-11 18:05:56,200 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.4 MiB
+2026-05-11 18:05:59,641 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1004.8 KiB
+2026-05-11 18:06:03,963 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.8 MiB
+2026-05-11 18:06:04,355 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1036.3 KiB
+2026-05-11 18:06:06,338 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1065.1 KiB
+2026-05-11 18:06:08,927 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1127.5 KiB
+2026-05-11 18:06:11,078 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1167.4 KiB
+2026-05-11 18:06:15,239 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1062.5 KiB
+2026-05-11 18:06:16,445 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1332.4 KiB
+2026-05-11 18:06:22,240 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1036.3 KiB
+2026-05-11 18:06:23,125 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1584.7 KiB
+2026-05-11 18:06:27,763 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1127.5 KiB
+2026-05-11 18:06:28,714 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1948.5 KiB
+2026-05-11 18:06:30,854 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1036.3 KiB
+2026-05-11 18:06:33,918 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1280.2 KiB
+2026-05-11 18:06:35,392 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:06:37,977 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1127.5 KiB
+2026-05-11 18:06:41,379 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1526.6 KiB
+2026-05-11 18:06:43,223 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.0 MiB
+2026-05-11 18:06:45,945 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1280.2 KiB
+2026-05-11 18:06:49,369 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1910.1 KiB
+2026-05-11 18:06:51,458 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.9 MiB
+2026-05-11 18:06:54,678 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1526.6 KiB
+2026-05-11 18:06:58,899 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:07:01,786 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.9 MiB
+2026-05-11 18:07:05,133 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1910.1 KiB
+2026-05-11 18:07:08,652 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:07:12,223 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.2 MiB
+2026-05-11 18:07:17,537 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:07:24,159 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 18:07:24,923 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 7.6 MiB
+2026-05-11 18:07:31,589 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:07:38,432 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.6 MiB
+2026-05-11 18:07:44,139 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.1 MiB
+2026-05-11 18:07:53,329 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.4 MiB
+2026-05-11 18:08:02,228 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 7.0 MiB
+2026-05-11 18:08:12,751 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.9 MiB
+2026-05-11 18:08:24,695 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 11.1 MiB
+2026-05-11 18:08:41,431 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.4 MiB
+2026-05-11 18:09:31,513 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1004.9 KiB
+2026-05-11 18:09:33,932 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1004.9 KiB
+2026-05-11 18:09:38,260 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1065.5 KiB
+2026-05-11 18:09:41,283 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1005.2 KiB
+2026-05-11 18:09:41,437 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1065.5 KiB
+2026-05-11 18:09:44,393 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1168.3 KiB
+2026-05-11 18:09:44,753 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1005.2 KiB
+2026-05-11 18:09:48,945 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1006.5 KiB
+2026-05-11 18:09:51,239 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1334.7 KiB
+2026-05-11 18:09:51,379 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1061.7 KiB
+2026-05-11 18:10:12,756 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1005.2 KiB
+2026-05-11 18:10:20,590 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1597.1 KiB
+2026-05-11 18:10:21,737 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1149.8 KiB
+2026-05-11 18:10:23,337 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1061.7 KiB
+2026-05-11 18:10:25,446 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1980.2 KiB
+2026-05-11 18:10:26,162 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1282.8 KiB
+2026-05-11 18:10:27,277 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1149.8 KiB
+2026-05-11 18:10:31,033 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:10:31,953 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1469.7 KiB
+2026-05-11 18:10:33,144 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1282.8 KiB
+2026-05-11 18:10:40,637 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1712.0 KiB
+2026-05-11 18:10:40,895 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1778.0 KiB
+2026-05-11 18:10:41,391 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1469.7 KiB
+2026-05-11 18:10:46,522 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1336.5 KiB
+2026-05-11 18:10:49,602 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1712.0 KiB
+2026-05-11 18:10:53,481 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2040.0 KiB
+2026-05-11 18:10:56,795 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:10:56,952 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1004.9 KiB
+2026-05-11 18:11:00,882 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.9 MiB
+2026-05-11 18:11:01,287 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1065.5 KiB
+2026-05-11 18:11:10,031 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.6 MiB
+2026-05-11 18:11:10,197 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1168.3 KiB
+2026-05-11 18:11:16,898 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.3 MiB
+2026-05-11 18:11:17,230 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1334.7 KiB
+2026-05-11 18:11:18,900 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1037.6 KiB
+2026-05-11 18:11:24,583 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1597.1 KiB
+2026-05-11 18:11:25,059 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.7 MiB
+2026-05-11 18:11:26,115 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1127.8 KiB
+2026-05-11 18:11:28,990 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1980.2 KiB
+2026-05-11 18:11:37,143 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1061.0 KiB
+2026-05-11 18:11:42,412 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:11:51,556 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1037.6 KiB
+2026-05-11 18:11:52,022 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:11:54,137 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1037.6 KiB
+2026-05-11 18:11:56,793 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1127.8 KiB
+2026-05-11 18:12:05,748 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.0 MiB
+2026-05-11 18:12:06,824 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1281.3 KiB
+2026-05-11 18:12:07,992 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1127.8 KiB
+2026-05-11 18:12:15,897 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.1 MiB
+2026-05-11 18:12:16,714 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1531.4 KiB
+2026-05-11 18:12:20,886 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1281.3 KiB
+2026-05-11 18:12:29,269 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.4 MiB
+2026-05-11 18:12:30,970 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1923.4 KiB
+2026-05-11 18:12:34,654 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1531.4 KiB
+2026-05-11 18:12:45,225 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.0 MiB
+2026-05-11 18:12:47,218 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:12:48,640 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1923.4 KiB
+2026-05-11 18:13:01,263 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.7 MiB
+2026-05-11 18:13:02,712 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:13:03,935 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:13:13,013 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 18:13:14,456 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:13:21,099 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.1 MiB
+2026-05-11 18:13:30,497 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.4 MiB
+2026-05-11 18:13:39,191 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.9 MiB
+2026-05-11 18:13:50,357 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.8 MiB
+2026-05-11 18:14:02,380 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 11.0 MiB
+2026-05-11 18:14:17,812 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.3 MiB
+2026-05-11 18:15:04,156 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1005.7 KiB
+2026-05-11 18:15:11,166 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1003.9 KiB
+2026-05-11 18:15:11,309 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1067.8 KiB
+2026-05-11 18:15:11,392 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1003.9 KiB
+2026-05-11 18:15:16,154 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1055.6 KiB
+2026-05-11 18:15:16,452 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1174.8 KiB
+2026-05-11 18:15:16,594 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1055.6 KiB
+2026-05-11 18:15:17,916 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1003.9 KiB
+2026-05-11 18:15:19,924 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1005.7 KiB
+2026-05-11 18:15:21,663 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1135.5 KiB
+2026-05-11 18:15:22,304 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1339.4 KiB
+2026-05-11 18:15:22,430 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1135.5 KiB
+2026-05-11 18:15:25,820 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1067.8 KiB
+2026-05-11 18:15:28,070 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1264.4 KiB
+2026-05-11 18:15:29,244 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1597.2 KiB
+2026-05-11 18:15:29,593 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1264.4 KiB
+2026-05-11 18:15:38,488 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1009.3 KiB
+2026-05-11 18:15:39,615 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1447.2 KiB
+2026-05-11 18:15:45,748 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1960.5 KiB
+2026-05-11 18:15:48,640 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1447.2 KiB
+2026-05-11 18:15:48,967 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1692.7 KiB
+2026-05-11 18:15:53,566 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:15:56,671 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1692.7 KiB
+2026-05-11 18:15:56,980 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2032.4 KiB
+2026-05-11 18:16:02,794 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1754.5 KiB
+2026-05-11 18:16:05,300 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1321.9 KiB
+2026-05-11 18:16:05,835 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:16:10,035 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.0 MiB
+2026-05-11 18:16:19,060 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.6 MiB
+2026-05-11 18:16:26,042 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.4 MiB
+2026-05-11 18:16:26,894 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1005.7 KiB
+2026-05-11 18:16:33,633 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.8 MiB
+2026-05-11 18:16:34,162 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1036.0 KiB
+2026-05-11 18:16:37,816 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1067.8 KiB
+2026-05-11 18:16:39,685 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1124.8 KiB
+2026-05-11 18:16:41,915 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1174.8 KiB
+2026-05-11 18:16:49,229 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1339.4 KiB
+2026-05-11 18:16:49,329 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1057.9 KiB
+2026-05-11 18:16:49,455 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1036.0 KiB
+2026-05-11 18:16:52,706 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1597.2 KiB
+2026-05-11 18:16:55,941 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1124.8 KiB
+2026-05-11 18:16:56,264 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1036.0 KiB
+2026-05-11 18:16:59,698 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1960.5 KiB
+2026-05-11 18:17:02,691 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1273.3 KiB
+2026-05-11 18:17:03,110 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1124.8 KiB
+2026-05-11 18:17:08,129 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:17:10,852 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1518.1 KiB
+2026-05-11 18:17:10,875 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1273.3 KiB
+2026-05-11 18:17:15,295 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:17:18,755 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1518.1 KiB
+2026-05-11 18:17:19,390 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1899.9 KiB
+2026-05-11 18:17:24,870 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.9 MiB
+2026-05-11 18:17:25,730 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1899.9 KiB
+2026-05-11 18:17:31,627 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:17:37,966 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.0 MiB
+2026-05-11 18:17:38,142 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:17:44,850 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:17:51,679 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.3 MiB
+2026-05-11 18:17:52,307 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:18:00,382 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 18:18:09,292 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.1 MiB
+2026-05-11 18:18:09,850 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 7.8 MiB
+2026-05-11 18:18:18,458 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.4 MiB
+2026-05-11 18:18:25,620 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.6 MiB
+2026-05-11 18:18:31,624 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.9 MiB
+2026-05-11 18:18:42,845 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.8 MiB
+2026-05-11 18:18:55,193 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 11.0 MiB
+2026-05-11 18:19:08,851 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.4 MiB
+2026-05-11 18:20:43,850 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1098.7 KiB
+2026-05-11 18:20:47,759 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1355.8 KiB
+2026-05-11 18:20:52,219 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1763.8 KiB
+2026-05-11 18:20:57,924 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.3 MiB
+2026-05-11 18:21:04,550 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:21:13,449 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.2 MiB
+2026-05-11 18:21:22,627 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.6 MiB
+2026-05-11 18:21:34,449 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 7.4 MiB
+2026-05-11 18:21:47,536 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 9.5 MiB
+2026-05-11 18:22:01,529 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 12.1 MiB
+2026-05-11 18:22:09,229 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1040.5 KiB
+2026-05-11 18:22:40,777 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.8 MiB
+2026-05-11 18:23:04,934 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.8 MiB
+2026-05-11 18:32:20,175 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1219.7 KiB
+2026-05-11 18:32:20,821 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1122.8 KiB
+2026-05-11 18:32:20,933 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1122.8 KiB
+2026-05-11 18:32:22,347 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1749.1 KiB
+2026-05-11 18:32:23,164 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1535.4 KiB
+2026-05-11 18:32:23,365 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1535.4 KiB
+2026-05-11 18:32:25,177 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 18:32:26,765 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 18:32:27,646 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1238.9 KiB
+2026-05-11 18:32:29,593 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.0 MiB
+2026-05-11 18:32:30,385 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1984.3 KiB
+2026-05-11 18:32:31,506 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.3 MiB
+2026-05-11 18:32:34,072 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.9 MiB
+2026-05-11 18:32:36,931 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 7.9 MiB
+2026-05-11 18:32:41,860 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.4 MiB
+2026-05-11 18:32:42,410 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1219.7 KiB
+2026-05-11 18:32:44,573 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1749.1 KiB
+2026-05-11 18:32:47,269 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 18:32:50,446 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.8 MiB
+2026-05-11 18:32:54,418 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.7 MiB
+2026-05-11 18:32:55,264 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1081.0 KiB
+2026-05-11 18:32:59,486 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.3 MiB
+2026-05-11 18:33:00,532 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1547.2 KiB
+2026-05-11 18:33:03,227 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1186.1 KiB
+2026-05-11 18:33:06,311 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 11.7 MiB
+2026-05-11 18:33:07,249 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.3 MiB
+2026-05-11 18:33:10,212 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1514.8 KiB
+2026-05-11 18:33:12,928 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1081.0 KiB
+2026-05-11 18:33:13,938 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.0 MiB
+2026-05-11 18:33:15,346 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.5 MiB
+2026-05-11 18:33:15,550 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1547.2 KiB
+2026-05-11 18:33:19,368 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1827.4 KiB
+2026-05-11 18:33:23,112 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.3 MiB
+2026-05-11 18:33:24,754 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 10.6 MiB
+2026-05-11 18:33:26,797 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 18:33:27,557 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.5 MiB
+2026-05-11 18:33:31,757 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.5 MiB
+2026-05-11 18:33:35,717 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.3 MiB
+2026-05-11 18:33:38,818 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1306.5 KiB
+2026-05-11 18:33:40,877 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 12.1 MiB
+2026-05-11 18:33:44,504 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1755.2 KiB
+2026-05-11 18:33:47,279 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 17.2 MiB
+2026-05-11 18:33:52,158 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 18:33:56,156 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 23.5 MiB
+2026-05-11 18:34:02,180 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.7 MiB
+2026-05-11 18:34:07,526 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 15.5 MiB
+2026-05-11 18:35:04,682 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1214.8 KiB
+2026-05-11 18:35:06,207 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1745.5 KiB
+2026-05-11 18:35:06,987 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1111.4 KiB
+2026-05-11 18:35:08,810 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 18:35:09,396 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1111.4 KiB
+2026-05-11 18:35:09,709 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1506.8 KiB
+2026-05-11 18:35:13,223 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1506.8 KiB
+2026-05-11 18:35:13,581 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1969.0 KiB
+2026-05-11 18:35:14,901 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1220.5 KiB
+2026-05-11 18:35:14,992 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 18:35:17,879 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.9 MiB
+2026-05-11 18:35:19,939 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.1 MiB
+2026-05-11 18:35:22,566 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.7 MiB
+2026-05-11 18:35:25,924 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 7.6 MiB
+2026-05-11 18:35:26,023 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1214.8 KiB
+2026-05-11 18:35:31,200 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1745.5 KiB
+2026-05-11 18:35:32,692 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.2 MiB
+2026-05-11 18:35:34,606 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 18:35:38,064 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.8 MiB
+2026-05-11 18:35:41,525 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.7 MiB
+2026-05-11 18:35:45,710 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.4 MiB
+2026-05-11 18:35:46,491 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1069.4 KiB
+2026-05-11 18:35:48,720 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1195.5 KiB
+2026-05-11 18:35:50,757 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 11.8 MiB
+2026-05-11 18:35:51,175 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1516.7 KiB
+2026-05-11 18:35:51,288 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1069.4 KiB
+2026-05-11 18:35:53,848 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1526.0 KiB
+2026-05-11 18:35:56,282 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.1 MiB
+2026-05-11 18:35:57,065 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 18:35:57,406 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1516.7 KiB
+2026-05-11 18:36:00,265 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1871.9 KiB
+2026-05-11 18:36:04,725 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 10.7 MiB
+2026-05-11 18:36:04,839 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.4 MiB
+2026-05-11 18:36:05,009 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 18:36:09,851 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.4 MiB
+2026-05-11 18:36:10,148 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 18:36:13,528 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.2 MiB
+2026-05-11 18:36:18,582 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 7.9 MiB
+2026-05-11 18:36:21,882 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1256.8 KiB
+2026-05-11 18:36:24,942 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 11.6 MiB
+2026-05-11 18:36:29,111 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1706.9 KiB
+2026-05-11 18:36:33,081 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.5 MiB
+2026-05-11 18:36:37,892 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 18:36:43,477 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 22.8 MiB
+2026-05-11 18:36:49,318 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.7 MiB
+2026-05-11 18:36:56,526 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 15.1 MiB
+2026-05-11 18:37:33,736 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1213.5 KiB
+2026-05-11 18:37:34,531 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1144.2 KiB
+2026-05-11 18:37:35,162 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1736.6 KiB
+2026-05-11 18:37:56,877 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1575.8 KiB
+2026-05-11 18:37:58,167 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 18:37:58,585 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1144.2 KiB
+2026-05-11 18:38:00,508 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1268.2 KiB
+2026-05-11 18:38:01,360 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1575.8 KiB
+2026-05-11 18:38:02,045 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1951.1 KiB
+2026-05-11 18:38:02,724 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 18:38:04,341 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:38:06,751 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.5 MiB
+2026-05-11 18:38:09,348 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.2 MiB
+2026-05-11 18:38:12,635 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.3 MiB
+2026-05-11 18:38:17,506 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.6 MiB
+2026-05-11 18:38:22,865 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1213.5 KiB
+2026-05-11 18:38:24,824 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1736.6 KiB
+2026-05-11 18:38:26,801 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1066.2 KiB
+2026-05-11 18:38:27,382 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 18:38:29,754 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1529.7 KiB
+2026-05-11 18:38:30,506 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.8 MiB
+2026-05-11 18:38:31,479 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1066.2 KiB
+2026-05-11 18:38:33,521 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.3 MiB
+2026-05-11 18:38:35,220 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.6 MiB
+2026-05-11 18:38:35,341 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1529.7 KiB
+2026-05-11 18:38:38,102 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.5 MiB
+2026-05-11 18:38:39,450 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.2 MiB
+2026-05-11 18:38:41,026 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.3 MiB
+2026-05-11 18:38:44,579 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1161.5 KiB
+2026-05-11 18:38:46,000 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 18:38:46,629 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 11.5 MiB
+2026-05-11 18:38:48,259 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.5 MiB
+2026-05-11 18:38:49,965 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1485.2 KiB
+2026-05-11 18:38:52,966 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 15.7 MiB
+2026-05-11 18:38:53,549 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.4 MiB
+2026-05-11 18:38:56,459 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1811.2 KiB
+2026-05-11 18:39:00,485 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 10.4 MiB
+2026-05-11 18:39:00,724 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.2 MiB
+2026-05-11 18:39:05,675 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1303.3 KiB
+2026-05-11 18:39:09,025 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 12.0 MiB
+2026-05-11 18:39:13,136 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1741.9 KiB
+2026-05-11 18:39:17,480 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 17.0 MiB
+2026-05-11 18:39:22,438 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 18:39:27,936 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 23.3 MiB
+2026-05-11 18:39:34,106 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 18:39:41,508 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 15.4 MiB
+2026-05-11 18:41:01,238 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1000.3 KiB
+2026-05-11 18:41:02,800 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1258.6 KiB
+2026-05-11 18:41:04,940 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1739.9 KiB
+2026-05-11 18:41:07,317 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 18:41:10,207 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.8 MiB
+2026-05-11 18:41:14,134 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.9 MiB
+2026-05-11 18:41:17,896 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1006.9 KiB
+2026-05-11 18:41:19,435 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.9 MiB
+2026-05-11 18:41:23,641 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1446.4 KiB
+2026-05-11 18:41:25,976 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 13.2 MiB
+2026-05-11 18:41:31,357 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1980.4 KiB
+2026-05-11 18:41:34,711 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 19.0 MiB
+2026-05-11 18:41:41,272 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 18:41:45,735 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 26.3 MiB
+2026-05-11 18:41:53,338 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.2 MiB
+2026-05-11 18:42:22,332 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 17.4 MiB
+2026-05-11 18:42:48,818 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 17.4 MiB
+2026-05-11 18:48:56,368 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1064.3 KiB
+2026-05-11 18:48:58,071 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1634.6 KiB
+2026-05-11 18:49:01,653 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 18:49:01,845 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1441.2 KiB
+2026-05-11 18:49:04,489 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1882.7 KiB
+2026-05-11 18:49:04,714 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1441.2 KiB
+2026-05-11 18:49:04,740 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1099.1 KiB
+2026-05-11 18:49:06,903 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 18:49:08,967 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:49:10,780 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.5 MiB
+2026-05-11 18:49:13,710 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.4 MiB
+2026-05-11 18:49:16,988 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.7 MiB
+2026-05-11 18:49:17,310 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1064.3 KiB
+2026-05-11 18:49:20,842 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.8 MiB
+2026-05-11 18:49:20,971 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1634.6 KiB
+2026-05-11 18:49:23,991 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 18:49:26,690 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.9 MiB
+2026-05-11 18:49:30,322 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.9 MiB
+2026-05-11 18:49:34,630 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1384.6 KiB
+2026-05-11 18:49:34,855 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.8 MiB
+2026-05-11 18:49:37,022 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 18:49:37,492 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1302.8 KiB
+2026-05-11 18:49:40,801 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 12.4 MiB
+2026-05-11 18:49:43,910 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1384.6 KiB
+2026-05-11 18:49:44,709 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.5 MiB
+2026-05-11 18:49:47,378 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1640.2 KiB
+2026-05-11 18:49:50,595 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 18:49:51,303 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 17.0 MiB
+2026-05-11 18:49:52,850 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 18:49:53,582 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.5 MiB
+2026-05-11 18:49:56,320 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1982.0 KiB
+2026-05-11 18:50:00,633 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.5 MiB
+2026-05-11 18:50:01,083 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 11.2 MiB
+2026-05-11 18:50:03,382 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1002.3 KiB
+2026-05-11 18:50:05,053 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.5 MiB
+2026-05-11 18:50:08,254 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1432.8 KiB
+2026-05-11 18:50:10,598 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 12.7 MiB
+2026-05-11 18:50:15,089 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1921.4 KiB
+2026-05-11 18:50:18,511 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 18.1 MiB
+2026-05-11 18:50:23,198 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:50:27,578 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 24.9 MiB
+2026-05-11 18:50:33,604 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.9 MiB
+2026-05-11 18:50:38,470 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.3 MiB
+2026-05-11 18:51:24,755 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1046.2 KiB
+2026-05-11 18:51:26,833 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1589.7 KiB
+2026-05-11 18:51:29,442 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:51:30,399 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1462.2 KiB
+2026-05-11 18:51:33,544 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1806.4 KiB
+2026-05-11 18:51:34,353 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1462.2 KiB
+2026-05-11 18:51:34,523 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1117.6 KiB
+2026-05-11 18:51:35,572 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 18:51:37,438 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.2 MiB
+2026-05-11 18:51:44,810 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.6 MiB
+2026-05-11 18:51:47,944 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.4 MiB
+2026-05-11 18:51:51,315 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.7 MiB
+2026-05-11 18:51:51,912 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1046.2 KiB
+2026-05-11 18:51:55,075 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.8 MiB
+2026-05-11 18:51:55,670 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1589.7 KiB
+2026-05-11 18:51:59,105 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:52:02,350 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.7 MiB
+2026-05-11 18:52:06,545 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.7 MiB
+2026-05-11 18:52:11,564 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.3 MiB
+2026-05-11 18:52:14,678 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1226.9 KiB
+2026-05-11 18:52:17,659 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 11.8 MiB
+2026-05-11 18:52:18,329 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1369.6 KiB
+2026-05-11 18:52:18,688 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1369.6 KiB
+2026-05-11 18:52:21,450 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1590.5 KiB
+2026-05-11 18:52:25,398 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.3 MiB
+2026-05-11 18:52:26,844 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 18:52:27,261 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 18:52:30,360 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1945.3 KiB
+2026-05-11 18:52:35,337 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 10.8 MiB
+2026-05-11 18:52:36,225 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.4 MiB
+2026-05-11 18:52:36,594 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.4 MiB
+2026-05-11 18:52:40,663 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:52:41,071 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.4 MiB
+2026-05-11 18:52:45,294 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.2 MiB
+2026-05-11 18:52:48,519 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1365.2 KiB
+2026-05-11 18:52:50,625 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 12.2 MiB
+2026-05-11 18:52:54,468 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1857.3 KiB
+2026-05-11 18:52:57,569 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 17.5 MiB
+2026-05-11 18:53:02,215 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.3 MiB
+2026-05-11 18:53:06,364 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 24.1 MiB
+2026-05-11 18:53:12,923 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.8 MiB
+2026-05-11 18:53:17,630 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 15.8 MiB
+2026-05-11 18:54:01,794 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1043.5 KiB
+2026-05-11 18:54:02,074 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1447.7 KiB
+2026-05-11 18:54:03,021 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1447.7 KiB
+2026-05-11 18:54:04,470 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1582.1 KiB
+2026-05-11 18:54:04,781 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 18:54:06,404 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1120.3 KiB
+2026-05-11 18:54:07,545 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:54:08,061 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.1 MiB
+2026-05-11 18:54:10,690 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1797.1 KiB
+2026-05-11 18:54:11,002 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.5 MiB
+2026-05-11 18:54:13,516 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.3 MiB
+2026-05-11 18:54:16,529 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.5 MiB
+2026-05-11 18:54:21,924 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.7 MiB
+2026-05-11 18:54:23,193 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1043.5 KiB
+2026-05-11 18:54:29,594 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1582.1 KiB
+2026-05-11 18:54:31,705 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:54:35,149 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.7 MiB
+2026-05-11 18:54:39,308 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.6 MiB
+2026-05-11 18:54:40,246 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1402.8 KiB
+2026-05-11 18:54:44,205 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.2 MiB
+2026-05-11 18:54:45,393 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 18:54:48,549 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1211.2 KiB
+2026-05-11 18:54:51,652 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 11.7 MiB
+2026-05-11 18:54:53,102 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.5 MiB
+2026-05-11 18:54:54,269 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1402.8 KiB
+2026-05-11 18:54:56,755 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1561.1 KiB
+2026-05-11 18:55:03,233 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.0 MiB
+2026-05-11 18:55:03,344 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 18:55:04,418 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 18:55:07,146 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1917.5 KiB
+2026-05-11 18:55:10,479 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 10.6 MiB
+2026-05-11 18:55:11,342 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.5 MiB
+2026-05-11 18:55:14,452 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.6 MiB
+2026-05-11 18:55:17,013 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1001.6 KiB
+2026-05-11 18:55:18,610 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.6 MiB
+2026-05-11 18:55:21,876 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1422.3 KiB
+2026-05-11 18:55:24,072 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 12.7 MiB
+2026-05-11 18:55:28,031 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1912.2 KiB
+2026-05-11 18:55:31,100 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 18.1 MiB
+2026-05-11 18:55:35,793 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 18:55:41,430 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 25.0 MiB
+2026-05-11 18:55:47,110 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.9 MiB
+2026-05-11 18:55:51,899 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.4 MiB
+2026-05-11 18:56:48,092 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1003.9 KiB
+2026-05-11 18:56:49,935 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1497.7 KiB
+2026-05-11 18:56:52,357 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.3 MiB
+2026-05-11 18:56:55,399 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.7 MiB
+2026-05-11 18:56:59,456 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.9 MiB
+2026-05-11 18:57:03,125 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1082.4 KiB
+2026-05-11 18:57:04,793 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 9.1 MiB
+2026-05-11 18:57:09,263 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1590.4 KiB
+2026-05-11 18:57:11,669 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 13.8 MiB
+2026-05-11 18:57:17,122 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 18:57:20,834 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 20.1 MiB
+2026-05-11 18:57:27,896 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.8 MiB
+2026-05-11 18:57:32,558 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 28.2 MiB
+2026-05-11 18:57:40,313 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.5 MiB
+2026-05-11 18:58:00,948 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 18.4 MiB
+2026-05-11 18:58:19,228 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 18.4 MiB
+2026-05-11 18:58:39,886 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 3 buckets as a result.
+2026-05-11 18:58:42,429 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 3 buckets as a result.
+2026-05-11 18:58:43,085 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 4 buckets as a result.
+2026-05-11 18:58:43,666 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 3 buckets as a result.
+2026-05-11 18:58:44,257 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 2 buckets as a result.
+2026-05-11 18:58:44,968 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 8 buckets as a result.
+2026-05-11 18:58:45,705 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 10 buckets as a result.
+2026-05-11 18:58:46,385 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 9 buckets as a result.
+2026-05-11 18:58:47,116 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 13 buckets as a result.
+2026-05-11 18:58:47,807 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 8 buckets as a result.
+2026-05-11 18:58:48,431 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 4 buckets as a result.
+2026-05-11 18:58:49,069 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 2 buckets as a result.
+2026-05-11 18:58:50,545 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 12 buckets as a result.
+2026-05-11 18:58:51,288 WARN feature.QuantileDiscretizer: Some quantiles were identical. Bucketing to 12 buckets as a result.
+2026-05-11 19:06:22,403 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1253.2 KiB
+2026-05-11 19:06:36,908 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1937.6 KiB
+2026-05-11 19:06:37,004 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1176.8 KiB
+2026-05-11 19:06:37,805 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1176.8 KiB
+2026-05-11 19:06:39,524 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.0 MiB
+2026-05-11 19:06:39,590 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1727.5 KiB
+2026-05-11 19:06:40,483 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1727.5 KiB
+2026-05-11 19:06:43,219 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.0 MiB
+2026-05-11 19:06:43,438 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1273.7 KiB
+2026-05-11 19:06:43,693 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 19:06:46,049 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.6 MiB
+2026-05-11 19:06:48,195 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.0 MiB
+2026-05-11 19:06:50,988 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.7 MiB
+2026-05-11 19:06:53,611 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.5 MiB
+2026-05-11 19:06:57,711 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.9 MiB
+2026-05-11 19:06:58,238 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1253.2 KiB
+2026-05-11 19:07:00,862 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1937.6 KiB
+2026-05-11 19:07:03,463 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.0 MiB
+2026-05-11 19:07:03,694 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1058.3 KiB
+2026-05-11 19:07:04,691 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1058.3 KiB
+2026-05-11 19:07:06,447 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.5 MiB
+2026-05-11 19:07:06,584 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1650.3 KiB
+2026-05-11 19:07:07,484 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1650.3 KiB
+2026-05-11 19:07:09,694 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.7 MiB
+2026-05-11 19:07:10,017 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 19:07:10,945 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 19:07:13,695 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 9.4 MiB
+2026-05-11 19:07:14,017 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.2 MiB
+2026-05-11 19:07:15,809 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.2 MiB
+2026-05-11 19:07:16,180 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1188.3 KiB
+2026-05-11 19:07:18,481 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 12.8 MiB
+2026-05-11 19:07:19,547 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.8 MiB
+2026-05-11 19:07:21,555 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1419.8 KiB
+2026-05-11 19:07:21,751 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.5 MiB
+2026-05-11 19:07:24,176 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.5 MiB
+2026-05-11 19:07:24,914 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1058.5 KiB
+2026-05-11 19:07:26,910 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 9.8 MiB
+2026-05-11 19:07:27,544 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1600.7 KiB
+2026-05-11 19:07:30,170 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1435.4 KiB
+2026-05-11 19:07:31,381 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 9.3 MiB
+2026-05-11 19:07:33,400 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 14.0 MiB
+2026-05-11 19:07:37,177 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1821.7 KiB
+2026-05-11 19:07:39,541 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 19.1 MiB
+2026-05-11 19:07:43,864 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 19:07:47,100 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 24.9 MiB
+2026-05-11 19:07:51,839 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 19:07:55,404 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 14.1 MiB
+2026-05-11 19:08:22,828 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1243.1 KiB
+2026-05-11 19:08:25,016 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1151.9 KiB
+2026-05-11 19:08:38,498 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1919.6 KiB
+2026-05-11 19:08:39,090 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1151.9 KiB
+2026-05-11 19:08:40,208 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1668.9 KiB
+2026-05-11 19:08:40,972 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.9 MiB
+2026-05-11 19:08:41,721 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1668.9 KiB
+2026-05-11 19:08:42,802 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 19:08:44,170 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.0 MiB
+2026-05-11 19:08:44,894 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1210.2 KiB
+2026-05-11 19:08:45,543 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.4 MiB
+2026-05-11 19:08:47,414 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.8 MiB
+2026-05-11 19:08:49,718 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.4 MiB
+2026-05-11 19:08:52,701 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.3 MiB
+2026-05-11 19:08:56,455 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.8 MiB
+2026-05-11 19:08:59,880 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1243.1 KiB
+2026-05-11 19:09:02,280 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1919.6 KiB
+2026-05-11 19:09:05,223 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.9 MiB
+2026-05-11 19:09:08,739 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.5 MiB
+2026-05-11 19:09:09,623 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1058.5 KiB
+2026-05-11 19:09:10,655 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1058.5 KiB
+2026-05-11 19:09:13,130 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.7 MiB
+2026-05-11 19:09:15,548 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1653.8 KiB
+2026-05-11 19:09:15,678 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1653.8 KiB
+2026-05-11 19:09:18,467 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 9.4 MiB
+2026-05-11 19:09:19,627 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 19:09:21,360 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 19:09:23,337 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1195.8 KiB
+2026-05-11 19:09:25,351 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 12.8 MiB
+2026-05-11 19:09:26,775 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.2 MiB
+2026-05-11 19:09:28,835 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.2 MiB
+2026-05-11 19:09:30,695 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1416.9 KiB
+2026-05-11 19:09:56,008 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.5 MiB
+2026-05-11 19:09:58,673 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.6 MiB
+2026-05-11 19:10:01,107 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1604.3 KiB
+2026-05-11 19:10:01,855 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.8 MiB
+2026-05-11 19:10:03,371 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1065.2 KiB
+2026-05-11 19:10:04,560 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 9.4 MiB
+2026-05-11 19:10:05,333 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 9.9 MiB
+2026-05-11 19:10:09,571 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1439.0 KiB
+2026-05-11 19:10:20,430 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 14.1 MiB
+2026-05-11 19:10:24,504 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1827.4 KiB
+2026-05-11 19:10:43,908 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 19.3 MiB
+2026-05-11 19:10:48,401 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 19:10:51,540 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 25.1 MiB
+2026-05-11 19:11:06,414 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 19:11:11,063 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 14.1 MiB
+2026-05-11 19:12:07,209 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1164.6 KiB
+2026-05-11 19:12:08,139 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1164.6 KiB
+2026-05-11 19:12:08,991 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1711.4 KiB
+2026-05-11 19:12:09,089 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1245.5 KiB
+2026-05-11 19:12:09,934 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1711.4 KiB
+2026-05-11 19:12:11,761 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1240.7 KiB
+2026-05-11 19:12:11,981 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1926.4 KiB
+2026-05-11 19:12:13,125 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 19:12:14,561 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.0 MiB
+2026-05-11 19:12:15,174 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.6 MiB
+2026-05-11 19:12:18,055 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.0 MiB
+2026-05-11 19:12:19,173 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.0 MiB
+2026-05-11 19:12:24,021 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.7 MiB
+2026-05-11 19:12:25,138 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1245.5 KiB
+2026-05-11 19:12:27,722 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 8.7 MiB
+2026-05-11 19:12:28,872 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1926.4 KiB
+2026-05-11 19:12:32,160 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 3.0 MiB
+2026-05-11 19:12:32,605 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 5.0 MiB
+2026-05-11 19:12:34,844 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.6 MiB
+2026-05-11 19:12:38,125 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.8 MiB
+2026-05-11 19:12:41,778 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 9.6 MiB
+2026-05-11 19:12:44,357 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1225.2 KiB
+2026-05-11 19:12:46,112 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 13.0 MiB
+2026-05-11 19:12:46,625 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1058.1 KiB
+2026-05-11 19:12:48,912 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1451.0 KiB
+2026-05-11 19:12:51,061 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.9 MiB
+2026-05-11 19:12:51,790 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1653.5 KiB
+2026-05-11 19:12:54,296 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1630.8 KiB
+2026-05-11 19:12:56,971 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 9.5 MiB
+2026-05-11 19:12:57,076 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 19:12:57,101 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1058.1 KiB
+2026-05-11 19:13:01,512 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.2 MiB
+2026-05-11 19:13:01,575 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1653.5 KiB
+2026-05-11 19:13:04,702 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.6 MiB
+2026-05-11 19:13:05,401 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.8 MiB
+2026-05-11 19:13:07,558 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.2 MiB
+2026-05-11 19:13:11,633 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 6.6 MiB
+2026-05-11 19:13:14,510 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1071.1 KiB
+2026-05-11 19:13:16,537 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 9.9 MiB
+2026-05-11 19:13:21,166 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1447.1 KiB
+2026-05-11 19:13:23,740 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 14.2 MiB
+2026-05-11 19:13:28,173 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1843.6 KiB
+2026-05-11 19:13:31,956 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 19.4 MiB
+2026-05-11 19:13:37,070 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+2026-05-11 19:13:41,213 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 25.2 MiB
+2026-05-11 19:13:47,031 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.4 MiB
+2026-05-11 19:13:51,892 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 14.2 MiB
+2026-05-11 19:14:40,922 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1178.3 KiB
+2026-05-11 19:14:42,945 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1792.8 KiB
+2026-05-11 19:14:45,449 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.8 MiB
+2026-05-11 19:14:49,033 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 4.5 MiB
+2026-05-11 19:14:53,299 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 7.2 MiB
+2026-05-11 19:14:56,946 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1196.0 KiB
+2026-05-11 19:14:58,501 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 10.9 MiB
+2026-05-11 19:15:03,202 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 1652.4 KiB
+2026-05-11 19:15:05,301 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 15.8 MiB
+2026-05-11 19:15:10,483 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.1 MiB
+2026-05-11 19:15:13,274 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 21.9 MiB
+2026-05-11 19:15:19,553 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.5 MiB
+2026-05-11 19:15:23,303 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 28.8 MiB
+2026-05-11 19:15:30,694 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 2.9 MiB
+2026-05-11 19:15:36,325 WARN scheduler.TaskSetManager: Stage 16186 contains a task of very large size (7995 KiB). The maximum recommended task size is 1000 KiB.
+2026-05-11 19:15:55,335 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 15.8 MiB
+2026-05-11 19:16:17,805 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.0 MiB
+2026-05-11 19:16:38,455 WARN scheduler.DAGScheduler: Broadcasting large task binary with size 16.0 MiB
+END: Spark ML (4977s)
+===== Stage 3 completed successfully =====
+
+Stage 3 execution summary
+Spark ML                                4977s
+TOTAL                                   4977s

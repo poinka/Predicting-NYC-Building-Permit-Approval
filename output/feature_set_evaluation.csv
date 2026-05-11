@@ -1,0 +1,9 @@
+feature_set,model,area_under_roc,area_under_pr
+full,LogisticRegression,0.8228627870758135,0.8329192482076343
+full,RandomForestClassifier,0.8428241092001151,0.858521338663614
+variance,LogisticRegression,0.7948189624989569,0.813012728472327
+variance,RandomForestClassifier,0.8700345946791629,0.8847341081046691
+coverage_variance,LogisticRegression,0.7889234387472854,0.8080693924975365
+coverage_variance,RandomForestClassifier,0.8659358333659842,0.882508146314548
+coverage_variance_chisq,LogisticRegression,0.7763807568909775,0.7980242931459816
+coverage_variance_chisq,RandomForestClassifier,0.8320197343779014,0.8535462893664331
