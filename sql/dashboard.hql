@@ -72,5 +72,4 @@ LOCATION '/user/team13/project/output/hyperparameter_results'
 TBLPROPERTIES ('skip.header.line.count'='1');
 
 SELECT * FROM dashboard_evaluation;
-SELECT * FROM dashboard_feature_selection;
 SELECT * FROM dashboard_hyperparameter_results;
