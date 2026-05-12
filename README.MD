@@ -156,9 +156,7 @@ Stage 4 prepares Hive datasets for the Superset dashboard:
 - `dashboard_model2_predictions`
 - `dashboard_evaluation`
 - `dashboard_feature_extraction`
-- `dashboard_feature_selection`
 - `dashboard_hyperparameter_results`
-- `dashboard_class_balance`
 
 These Hive objects are used as Superset datasets for the dashboard charts.
 
