@@ -518,12 +518,8 @@ def train_random_forest(train_data, test_data, save_artifacts):
     )
 
 
-def save_evaluation(spark, roc_lr, pr_lr, roc_rf, pr_rf):
-    """Save final model metrics."""
-    rows = [
-        ["LogisticRegression", float(roc_lr), float(pr_lr)],
-        ["RandomForestClassifier", float(roc_rf), float(pr_rf)],
-    ]
+def save_evaluation(spark, rows):
+    """Save best model metrics for the dashboard."""
     (
         spark.createDataFrame(rows, ["model", "area_under_roc", "area_under_pr"])
         .coalesce(1)
@@ -566,39 +562,11 @@ def get_param(param_map, name):
     return values[0] if values else ""
 
 
-def save_hyperparameter_results(spark, lr_cv, lr_grid, rf_cv, rf_grid):
-    """Save cross-validation results for all hyperparameter combinations."""
-    lr_best_metric = max(lr_cv.avgMetrics)
-    rf_best_metric = max(rf_cv.avgMetrics)
-    lr_rows = [
-        [
-            "LogisticRegression",
-            index + 1,
-            get_param(param_map, "regParam"),
-            get_param(param_map, "elasticNetParam"),
-            "",
-            "",
-            float(lr_cv.avgMetrics[index]),
-            "yes" if lr_cv.avgMetrics[index] == lr_best_metric else "no",
-        ]
-        for index, param_map in enumerate(lr_grid)
-    ]
-    rf_rows = [
-        [
-            "RandomForestClassifier",
-            index + 1,
-            "",
-            "",
-            get_param(param_map, "numTrees"),
-            get_param(param_map, "maxDepth"),
-            float(rf_cv.avgMetrics[index]),
-            "yes" if rf_cv.avgMetrics[index] == rf_best_metric else "no",
-        ]
-        for index, param_map in enumerate(rf_grid)
-    ]
+def save_hyperparameter_results(spark, rows):
+    """Save best feature-set hyperparameter results for the dashboard."""
     (
         spark.createDataFrame(
-            lr_rows + rf_rows,
+            rows,
             [
                 "model",
                 "param_set",
@@ -622,6 +590,36 @@ def save_hyperparameter_results(spark, lr_cv, lr_grid, rf_cv, rf_grid):
         "hdfs dfs -cat project/output/hyperparameter_results/part* > "
         "output/hyperparameter_results.csv"
     )
+
+
+def best_evaluation_rows(rows):
+    """Select the best feature-set result for each model."""
+    return [
+        [row[1], row[2], row[3]]
+        for row in best_feature_set_rows(rows).values()
+    ]
+
+
+def best_feature_set_rows(rows):
+    """Select the best feature-set row for each model."""
+    best_by_model = {}
+    for feature_set, model, roc, pr in rows:
+        if model not in best_by_model or roc > best_by_model[model][2]:
+            best_by_model[model] = [feature_set, model, roc, pr]
+    return best_by_model
+
+
+def best_hyperparameter_rows(rows, evaluation_rows):
+    """Keep hyperparameter rows that belong to the best feature-set per model."""
+    best_feature_sets = {
+        model: row[0]
+        for model, row in best_feature_set_rows(evaluation_rows).items()
+    }
+    return [
+        row[1:]
+        for row in rows
+        if row[0] == best_feature_sets[row[1]]
+    ]
 
 
 def build_hyperparameter_rows(feature_set, lr_cv, lr_grid, rf_cv, rf_grid):
@@ -809,21 +807,12 @@ def run_feature_set(jobs, catalog, eligible_features, config):
     }
 
 
-def save_final_outputs(spark, final_result):
+def save_final_outputs(spark, evaluation_rows, hyperparameter_rows):
     """Save dashboard-compatible final model outputs."""
-    save_evaluation(
-        spark,
-        final_result["roc_lr"],
-        final_result["pr_lr"],
-        final_result["roc_rf"],
-        final_result["pr_rf"],
-    )
+    save_evaluation(spark, best_evaluation_rows(evaluation_rows))
     save_hyperparameter_results(
         spark,
-        final_result["lr_cv"],
-        final_result["lr_grid"],
-        final_result["rf_cv"],
-        final_result["rf_grid"],
+        best_hyperparameter_rows(hyperparameter_rows, evaluation_rows),
     )
 
 
@@ -837,7 +826,6 @@ def main():
     save_feature_set_catalog(spark, catalog_rows)
     all_evaluation_rows = []
     all_hyperparameter_rows = []
-    final_results = None
     final_features = []
     for config in FEATURE_SET_CONFIGS:
         result = run_feature_set(jobs, catalog, eligible_features, config)
@@ -845,11 +833,10 @@ def main():
         all_hyperparameter_rows += result["hyperparameters"]
         if result["feature_set"] == FINAL_FEATURE_SET:
             final_features = result["features"]
-            final_results = result["final"]
     save_feature_extraction(spark, catalog_rows, final_features)
     save_feature_set_evaluation(spark, all_evaluation_rows)
     save_feature_set_hyperparameter_results(spark, all_hyperparameter_rows)
-    save_final_outputs(spark, final_results)
+    save_final_outputs(spark, all_evaluation_rows, all_hyperparameter_rows)
 
 
 if __name__ == "__main__":

@@ -17,6 +17,4 @@ The helper scripts are:
 - `run_hive_dashboard.sh` prepares the Hive layer that Superset will later use
 - `modeling.py` contains the actual Spark ML pipeline used in Stage 3
 
-`modeling.py` starts from a manually selected set of modeling candidates. It then keeps only features with at least 50% non-null values in the binary `P/J` subset. For categorical columns, it also removes columns with only one distinct value after filtering, because constant categorical columns cannot be encoded as useful model features.
-
 `scripts/` contains the executable order of the project pipeline.
